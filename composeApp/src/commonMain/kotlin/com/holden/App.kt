@@ -1,7 +1,5 @@
 package com.holden
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
@@ -12,29 +10,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
-import shared20.composeapp.generated.resources.Res
-import shared20.composeapp.generated.resources.compose_multiplatform
-
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 @Preview
 fun App() {
     val client = remember { createHttpClient() }
     MaterialTheme {
-        var resultFromServer by remember { mutableStateOf("") }
+        var gameId by remember { mutableStateOf(Uuid.random().toHexString()) }
+        var gameFromServer by remember { mutableStateOf<Game?>(null) }
         val serverScope = rememberCoroutineScope()
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = {
                 serverScope.launch {
-                    resultFromServer = client.get("/").body()
+                    client.post("/games") {
+                        contentType(ContentType.Application.Json)
+                        setBody(Game(id = gameId))
+                    }
                 }
             }) {
-                Text("Click me!")
+                Text("create game $gameId")
             }
-            Text("the result: $resultFromServer")
+            Button(onClick = {
+                serverScope.launch {
+                    try {
+                        gameFromServer = client.get("/games/$gameId").body()
+                    } catch (e: NoTransformationFoundException) {
+                        println("error: ${e.message}")
+                    }
+                }
+            }) {
+                Text("Get game $gameId")
+            }
+            Text("the game: ${gameFromServer?.id}")
         }
     }
 }

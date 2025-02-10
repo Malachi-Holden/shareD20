@@ -9,5 +9,6 @@ fun main() = application {
         title = "shareD20",
     ) {
         App()
+
     }
 }
