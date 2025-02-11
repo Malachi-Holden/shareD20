@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 @Composable
@@ -22,32 +22,38 @@ import kotlin.uuid.Uuid
 fun App() {
     val client = remember { createHttpClient() }
     MaterialTheme {
-        var gameId by remember { mutableStateOf(Uuid.random().toHexString()) }
         var gameFromServer by remember { mutableStateOf<Game?>(null) }
         val serverScope = rememberCoroutineScope()
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = {
                 serverScope.launch {
-                    client.post("/games") {
+                    gameFromServer = client.post("/games") {
                         contentType(ContentType.Application.Json)
-                        setBody(Game(id = gameId))
-                    }
+                        setBody(Game(name = "my game"))
+                    }.body()
                 }
             }) {
-                Text("create game $gameId")
+                Text("create game ${gameFromServer?.name}")
+            }
+            Button(onClick = {
+                serverScope.launch {
+                    client.delete("/games/${gameFromServer?.id}")
+                }
+            }) {
+                Text("remove ${gameFromServer?.id}")
             }
             Button(onClick = {
                 serverScope.launch {
                     try {
-                        gameFromServer = client.get("/games/$gameId").body()
+                        gameFromServer = client.get("/games/${gameFromServer?.id}").body()
                     } catch (e: NoTransformationFoundException) {
                         println("error: ${e.message}")
                     }
                 }
             }) {
-                Text("Get game $gameId")
+                Text("Get game: ${gameFromServer?.id}")
             }
-            Text("the game: ${gameFromServer?.id}")
+            Text("the game: ${gameFromServer?.name}")
         }
     }
 }
