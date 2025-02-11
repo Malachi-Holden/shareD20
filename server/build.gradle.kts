@@ -19,6 +19,8 @@ dependencies {
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.contentnegotiation)
     implementation(libs.ktor.server.json)
+    testImplementation(libs.ktor.client.core)
     testImplementation(libs.ktor.server.tests)
+    testImplementation(libs.ktor.server.core)
     testImplementation(libs.kotlin.test.junit)
 }
