@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -20,38 +20,42 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 @Preview
 fun App() {
+    // test code for latest server changes
     val client = remember { createHttpClient() }
     MaterialTheme {
-        var gameFromServer by remember { mutableStateOf<Game?>(null) }
+        var gameSetFromServer by remember { mutableStateOf<Game?>(null) }
         val serverScope = rememberCoroutineScope()
+        val (gameTitle, setGameTitle) = remember { mutableStateOf("") }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            TextField(gameTitle, setGameTitle)
             Button(onClick = {
                 serverScope.launch {
-                    gameFromServer = client.post("/games") {
+                    gameSetFromServer = client.post("/games") {
                         contentType(ContentType.Application.Json)
-                        setBody(Game(name = "my game"))
+                        setBody(Game(name = gameTitle))
                     }.body()
                 }
             }) {
-                Text("create game ${gameFromServer?.name}")
+                Text("create game $gameTitle")
             }
             Button(onClick = {
                 serverScope.launch {
-                    client.delete("/games/${gameFromServer?.id}")
+                    client.delete("/games/${gameSetFromServer?.id}")
                 }
             }) {
-                Text("remove ${gameFromServer?.id}")
+                Text("remove ${gameSetFromServer?.id}")
             }
+            var gameFromServer by remember { mutableStateOf<Game?>(null) }
             Button(onClick = {
                 serverScope.launch {
                     try {
-                        gameFromServer = client.get("/games/${gameFromServer?.id}").body()
+                        gameFromServer = client.get("/games/${gameSetFromServer?.id}").body()
                     } catch (e: NoTransformationFoundException) {
                         println("error: ${e.message}")
                     }
                 }
             }) {
-                Text("Get game: ${gameFromServer?.id}")
+                Text("Get game: ${gameSetFromServer?.id}")
             }
             Text("the game: ${gameFromServer?.name}")
         }
