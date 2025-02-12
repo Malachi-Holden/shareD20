@@ -15,7 +15,9 @@ fun main() {
         .start(wait = true)
 }
 
-fun Application.module() {
+fun Application.module(
+    repository: D20Repository = InMemoryD20Repository()
+) {
     install(CORS){ // to allow testing on localhost
         allowHost("localhost:8081", schemes = listOf("http", "https"))
         allowMethod(HttpMethod.Get)
@@ -33,6 +35,6 @@ fun Application.module() {
         get("/") {
             call.respondText("Welcome to shareD20")
         }
-        gamesRoutes(InMemoryD20Repository())
+        gamesRoutes(repository)
     }
 }
