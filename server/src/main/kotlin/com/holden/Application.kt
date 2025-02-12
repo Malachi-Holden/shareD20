@@ -1,9 +1,11 @@
 package com.holden
 
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -13,8 +15,10 @@ fun main() {
         .start(wait = true)
 }
 
-fun Application.module() {
-    install(CORS){
+fun Application.module(
+    repository: D20Repository = InMemoryD20Repository()
+) {
+    install(CORS){ // to allow testing on localhost
         allowHost("localhost:8081", schemes = listOf("http", "https"))
         allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Post)
@@ -23,10 +27,14 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
         allowCredentials = true
     }
+    install(ContentNegotiation) {
+        json()
+    }
 
     routing {
         get("/") {
-            call.respondText("Ktor: ${Greeting().greet()}")
+            call.respondText("Welcome to shareD20")
         }
+        gamesRoutes(repository)
     }
 }

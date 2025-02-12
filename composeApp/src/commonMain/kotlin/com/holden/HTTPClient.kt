@@ -16,7 +16,9 @@ fun createHttpClient() = HttpClient {
         })
     }
     defaultRequest {
-        host = "0.0.0.0"
+        host = localHost
         port = 8080
     }
 }
+
+expect val localHost: String
