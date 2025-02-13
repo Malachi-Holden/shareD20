@@ -14,7 +14,7 @@ fun generateSequentialIds(): Iterator<String>{
 }
 
 class D20TestRepository: D20Repository by InMemoryD20Repository(
-    generateIds = generateSequentialIds()
+    generateCodes = generateSequentialIds()
 )
 
 fun d20TestApplication(

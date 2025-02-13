@@ -1,5 +1,6 @@
 package com.holden
 
+import com.holden.games.gamesRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -18,6 +19,7 @@ fun main() {
 fun Application.module(
     repository: D20Repository = InMemoryD20Repository()
 ) {
+    databaseFactory()
     install(CORS){ // to allow testing on localhost
         allowHost("localhost:8081", schemes = listOf("http", "https"))
         allowMethod(HttpMethod.Get)
