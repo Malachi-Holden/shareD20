@@ -3,6 +3,7 @@ import io.github.cdimascio.dotenv.Dotenv
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.transaction
 
 fun databaseFactory() {
     val dotenv = Dotenv.load()

@@ -3,13 +3,12 @@ package com.holden
 import com.holden.util.uniqueRandomStringIterator
 
 val GAME_ID_LENGTH = 8
-class InMemoryD20Repository(
+class InMemoryD20Repository( // move to tests
     private val games: MutableMap<String, Game> = mutableMapOf(),
     private val generateCodes: Iterator<String> = uniqueRandomStringIterator(GAME_ID_LENGTH) {
         games.contains(it)
     }
 ): D20Repository {
-
 
     override fun addGame(form: GameForm): Game {
         val code = generateCodes.next()

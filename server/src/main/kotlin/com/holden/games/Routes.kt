@@ -21,8 +21,8 @@ fun Routing.gamesRoutes(repository: D20Repository) = route("/games") {
         }
     }
 
-    get("/{id}") {
-        val code = call.pathParameters["id"]
+    get("/{code}") {
+        val code = call.pathParameters["code"]
         repository.getGameByCode(code)
             ?.let {
                 call.respond(it)
@@ -30,8 +30,8 @@ fun Routing.gamesRoutes(repository: D20Repository) = route("/games") {
             ?: call.respond(HttpStatusCode.NotFound)
     }
 
-    delete("/{id}") {
-        val code = call.pathParameters["id"]
+    delete("/{code}") {
+        val code = call.pathParameters["code"]
         if (repository.deleteGame(code)) {
             call.respond(HttpStatusCode.NoContent)
         } else {
