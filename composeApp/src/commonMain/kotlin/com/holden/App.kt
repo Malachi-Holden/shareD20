@@ -32,7 +32,7 @@ fun App() {
                 serverScope.launch {
                     gameSetFromServer = client.post("/games") {
                         contentType(ContentType.Application.Json)
-                        setBody(Game(name = gameTitle))
+                        setBody(GameForm(name = gameTitle))
                     }.body()
                 }
             }) {
@@ -40,22 +40,22 @@ fun App() {
             }
             Button(onClick = {
                 serverScope.launch {
-                    client.delete("/games/${gameSetFromServer?.id}")
+                    client.delete("/games/${gameSetFromServer?.code}")
                 }
             }) {
-                Text("remove ${gameSetFromServer?.id}")
+                Text("remove ${gameSetFromServer?.code}")
             }
             var gameFromServer by remember { mutableStateOf<Game?>(null) }
             Button(onClick = {
                 serverScope.launch {
                     try {
-                        gameFromServer = client.get("/games/${gameSetFromServer?.id}").body()
+                        gameFromServer = client.get("/games/${gameSetFromServer?.code}").body()
                     } catch (e: NoTransformationFoundException) {
                         println("error: ${e.message}")
                     }
                 }
             }) {
-                Text("Get game: ${gameSetFromServer?.id}")
+                Text("Get game: ${gameSetFromServer?.code}")
             }
             Text("the game: ${gameFromServer?.name}")
         }
