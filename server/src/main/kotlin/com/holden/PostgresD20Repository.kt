@@ -5,8 +5,9 @@ import com.holden.games.GamesTable
 import com.holden.games.toModel
 import com.holden.util.uniqueRandomStringIterator
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insertReturning
 import org.jetbrains.exposed.sql.transactions.transaction
+
+val GAME_ID_LENGTH = 8 // in the future this could be set by the administrator
 
 class PostgresD20Repository(
     private val generateCodes: Iterator<String> = uniqueRandomStringIterator(GAME_ID_LENGTH) { code ->

@@ -1,9 +1,6 @@
 package com.holden
 
-import com.holden.games.GameEntity
-import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
-import com.holden.games.toModel
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -13,10 +10,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 
 fun main() {
     databaseFactory()
