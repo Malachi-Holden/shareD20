@@ -14,11 +14,6 @@ class PostgresD20Repository(
         GameEntity.findById(code) != null
     }
 ): D20Repository {
-    init {
-        transaction {
-            SchemaUtils.create(GamesTable)
-        }
-    }
     override fun addGame(form: GameForm): Game = transaction {
         GameEntity.new(generateCodes.next()) {
             name = form.name

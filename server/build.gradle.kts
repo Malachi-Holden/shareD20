@@ -30,4 +30,5 @@ dependencies {
     testImplementation(libs.ktor.client.contentnegotiation)
     testImplementation(libs.ktor.server.core)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.h2database)
 }

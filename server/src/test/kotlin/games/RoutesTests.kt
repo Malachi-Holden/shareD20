@@ -10,7 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlin.test.*
 
-class GamesRoutesTests {
+class RoutesTests {
     lateinit var repository: D20Repository
 
     @BeforeTest
