@@ -2,6 +2,7 @@ package com.holden
 
 import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
+import com.holden.players.playersRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -45,5 +46,6 @@ fun Application.module(
             call.respondText("Welcome to shareD20")
         }
         gamesRoutes(repository)
+        playersRoutes(repository)
     }
 }

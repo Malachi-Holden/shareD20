@@ -18,5 +18,19 @@ interface D20Repository {
      */
     fun getGameByCode(code: String?): Game?
 
+    /**
+     * Attempts to add a player to the given game.
+     * If both exist and the operation is successful this returns true, otherwise false
+     */
+    fun addPlayerToGame(playerId: Int?, gameCode: String?): Boolean
+
+    /**
+     * Checks if a game exists in the repository with the given code
+     */
     fun hasGameWithCode(code: String?): Boolean
+
+    fun createPlayer(form: PlayerForm): Player
+    fun deletePlayer(id: Int?): Boolean
+    fun getPlayer(id: Int?): Player?
+    fun hasPlayer(id: Int?): Boolean
 }
