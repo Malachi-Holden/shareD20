@@ -1,21 +1,40 @@
 package games
 
-import D20TestRepository
 import com.holden.*
+import com.holden.games.GamesTable
+import com.holden.players.PlayersTable
+import com.holden.generateSequentialGameCodes
 import d20TestApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.test.*
 
 class RoutesTests {
     lateinit var repository: D20Repository
-    lateinit var testDM: Player
+    lateinit var testDM: PlayerForm
 
     @BeforeTest
     fun setup() {
-        repository = D20TestRepository()
-        testDM = repository.createPlayer(PlayerForm("jack", true, null))
+        Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", driver = "org.h2.Driver")
+        transaction {
+            SchemaUtils.create(GamesTable)
+            SchemaUtils.create(PlayersTable)
+        }
+        repository = PostgresD20Repository(generateCodes = generateSequentialGameCodes())
+        testDM = PlayerForm("jack", true, null)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        transaction {
+            SchemaUtils.drop(PlayersTable)
+            SchemaUtils.drop(GamesTable)
+        }
     }
 
     @Test
@@ -55,9 +74,10 @@ class RoutesTests {
 
     @Test
     fun `post player should add the correct player`() = d20TestApplication(repository) { client ->
+        val testGame = repository.addGame(GameForm("testgame", testDM))
         val response = client.post("/players") {
             contentType(ContentType.Application.Json)
-            setBody(PlayerForm("Jane", false, null))
+            setBody(PlayerForm("Jane", false, testGame.code))
         }
         assertEquals(HttpStatusCode.OK, response.status)
         val player = response.body<Player>()
@@ -76,9 +96,22 @@ class RoutesTests {
             contentType(ContentType.Application.Json)
             setBody(PlayerForm("Jane", false, code))
         }
+        assertEquals(HttpStatusCode.OK, response.status)
         val player = response.body<Player>()
         val game = repository.getGameByCode(code)
-        assertEquals(game?.players?.last()?.name, player.name)
-        assertEquals(game?.code, player.gameCode)
+        assertEquals(game.players.last().name, player.name)
+        assertEquals(game.code, player.gameCode)
+    }
+
+    @Test
+    fun `post player should return 404 if the game code doesn't exist`() = d20TestApplication(repository) { client ->
+        val badCode = "66666666"
+        val response = client.post("/players") {
+            contentType(ContentType.Application.Json)
+            setBody(PlayerForm("Jane", false, badCode))
+        }
+        assertEquals(HttpStatusCode.NotFound, response.status)
+
+        assertEquals("No game found with code 66666666", response.bodyAsText())
     }
 }

@@ -1,36 +1,74 @@
 package com.holden
 
+class InvalidGameCode(code: String?): IllegalArgumentException("No game found with code $code")
+class InvalidPlayerId(id: Int?): IllegalArgumentException("No player found with id: $id")
+
 interface D20Repository {
 
     /**
-     * Adds a new game to the repository, generating an id for it and returning a new game with the new id
+     * Adds a new game to the repository
+     * @param form Describes the game to be added
+     * @return The game that was added to the repository
      */
     fun addGame(form: GameForm): Game
 
     /**
-     * Attempts to delete the game at id
-     * Returns true if the id is non-null and a game exists with that id, false else wise
+     * Attempts to delete a game
+     * @param code The code of the game to delete
+     * @throws [InvalidGameCode] if [code] is null or doesn't exist in the repository
      */
-    fun deleteGame(code: String?): Boolean
+    fun deleteGame(code: String?)
 
     /**
-     * Gets a game with id, returns null if no game exists with that id (including if the id is null)
+     * Gets a game from the repository
+     * @param code The code of the game to get
+     * @throws [InvalidGameCode] if [code] is null or doesn't exist in the repository
      */
-    fun getGameByCode(code: String?): Game?
+    fun getGameByCode(code: String?): Game
 
     /**
-     * Attempts to add a player to the given game.
-     * If both exist and the operation is successful this returns true, otherwise false
+     * Attempts to add a player to a game.
+     * @param playerId The id of the player to add
+     * @param gameCode The code of the game to add to
+     * @throws [InvalidPlayerId] if [playerId] is null or doesn't exist in the repository
+     * @throws [InvalidGameCode] if [gameCode] is null or doesn't exist in the repository
      */
-    fun addPlayerToGame(playerId: Int?, gameCode: String?): Boolean
+    fun addPlayerToGame(playerId: Int?, gameCode: String?)
 
     /**
-     * Checks if a game exists in the repository with the given code
+     * Checks if a game exists in the repository
+     * @param code The code to check
+     * @return [true] if the game exists, [false] otherwise
      */
     fun hasGameWithCode(code: String?): Boolean
 
+    /**
+     * Attempts to create a player
+     * @param form Describes the player to be added
+     * @throws [InvalidGameCode] if the provided gameCode doesn't exist in the repository
+     * @return The player that was added to the repository
+     */
     fun createPlayer(form: PlayerForm): Player
-    fun deletePlayer(id: Int?): Boolean
-    fun getPlayer(id: Int?): Player?
+
+    /**
+     * Attempts to delete a player
+     * @param id Id of the player to delete
+     * @throws [InvalidPlayerId] if [playerId] is null or doesn't exist in the repository
+     */
+    fun deletePlayer(id: Int?)
+
+    /**
+     * Gets a player from the repository
+     * @param id Id of the player to get
+     * @throws [InvalidPlayerId] if [playerId] is null or doesn't exist in the repository
+     * @return The player
+     */
+    fun getPlayer(id: Int?): Player
+
+    /**
+     * Checks if a player exists in the repository
+     * @param id Id of the player to check
+     * @return [true] if the player exists, [false] otherwise
+     */
     fun hasPlayer(id: Int?): Boolean
 }

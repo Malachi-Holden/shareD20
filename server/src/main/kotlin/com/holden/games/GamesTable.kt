@@ -24,4 +24,11 @@ class GameEntity(code: EntityID<String>): Entity<String>(code) {
     val players by PlayerEntity optionalReferrersOn PlayersTable.gameCode
 }
 
-fun GameEntity.toModel() = Game(code = code.value, name = name, players = players.map { it.toModel() })
+fun GameEntity.toModel() = Game(
+    code = code.value,
+    name = name,
+    players = players
+        .map {
+            it.toModel()
+        }
+)

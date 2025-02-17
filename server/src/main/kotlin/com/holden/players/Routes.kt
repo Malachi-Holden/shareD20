@@ -1,6 +1,8 @@
 package com.holden.players
 
 import com.holden.D20Repository
+import com.holden.InvalidGameCode
+import com.holden.InvalidPlayerId
 import com.holden.PlayerForm
 import io.ktor.http.*
 import io.ktor.serialization.*
@@ -14,6 +16,8 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
             val form = call.receive<PlayerForm>()
             val newPlayer = repository.createPlayer(form)
             call.respond(newPlayer)
+        } catch (e: InvalidGameCode) {
+            call.respond(HttpStatusCode.NotFound, e.message ?: "")
         } catch (ex: IllegalStateException) {
             call.respond(HttpStatusCode.BadRequest)
         } catch (ex: JsonConvertException) {
@@ -23,17 +27,20 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
 
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
-        repository.getPlayer(id)?.let {
-            call.respond(it)
-        } ?: call.respond(HttpStatusCode.NotFound)
+        try {
+            call.respond(repository.getPlayer(id))
+        } catch (e: InvalidPlayerId) {
+            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+        }
     }
 
     delete("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
-        if (repository.deletePlayer(id)) {
+        try {
+            repository.deletePlayer(id)
             call.respond(HttpStatusCode.NoContent)
-        } else {
-            call.respond(HttpStatusCode.NotFound)
+        } catch (e: InvalidPlayerId) {
+            call.respond(HttpStatusCode.NotFound, e.message ?: "")
         }
     }
 }

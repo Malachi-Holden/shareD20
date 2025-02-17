@@ -10,4 +10,4 @@ data class Game(
 )
 
 @Serializable
-data class GameForm(val name: String, val dm: Player)
+data class GameForm(val name: String, val dm: PlayerForm)

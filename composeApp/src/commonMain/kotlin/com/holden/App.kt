@@ -21,43 +21,44 @@ import kotlin.uuid.ExperimentalUuidApi
 @Preview
 fun App() {
     // test code for latest server changes
-    val client = remember { createHttpClient() }
+//    val client = remember { createHttpClient() }
     MaterialTheme {
-        var gameSetFromServer by remember { mutableStateOf<Game?>(null) }
-        val serverScope = rememberCoroutineScope()
-        val (gameTitle, setGameTitle) = remember { mutableStateOf("") }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TextField(gameTitle, setGameTitle)
-            Button(onClick = {
-                serverScope.launch {
-                    gameSetFromServer = client.post("/games") {
-                        contentType(ContentType.Application.Json)
-                        setBody(GameForm(name = gameTitle))
-                    }.body()
-                }
-            }) {
-                Text("create game $gameTitle")
-            }
-            Button(onClick = {
-                serverScope.launch {
-                    client.delete("/games/${gameSetFromServer?.code}")
-                }
-            }) {
-                Text("remove ${gameSetFromServer?.code}")
-            }
-            var gameFromServer by remember { mutableStateOf<Game?>(null) }
-            Button(onClick = {
-                serverScope.launch {
-                    try {
-                        gameFromServer = client.get("/games/${gameSetFromServer?.code}").body()
-                    } catch (e: NoTransformationFoundException) {
-                        println("error: ${e.message}")
-                    }
-                }
-            }) {
-                Text("Get game: ${gameSetFromServer?.code}")
-            }
-            Text("the game: ${gameFromServer?.name}")
-        }
+        GamePage()
+//        var gameSetFromServer by remember { mutableStateOf<Game?>(null) }
+//        val serverScope = rememberCoroutineScope()
+//        val (gameTitle, setGameTitle) = remember { mutableStateOf("") }
+//        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+//            TextField(gameTitle, setGameTitle)
+//            Button(onClick = {
+//                serverScope.launch {
+//                    gameSetFromServer = client.post("/games") {
+//                        contentType(ContentType.Application.Json)
+//                        setBody(GameForm(name = gameTitle, dm = PlayerForm("", false, null)))
+//                    }.body()
+//                }
+//            }) {
+//                Text("create game $gameTitle")
+//            }
+//            Button(onClick = {
+//                serverScope.launch {
+//                    client.delete("/games/${gameSetFromServer?.code}")
+//                }
+//            }) {
+//                Text("remove ${gameSetFromServer?.code}")
+//            }
+//            var gameFromServer by remember { mutableStateOf<Game?>(null) }
+//            Button(onClick = {
+//                serverScope.launch {
+//                    try {
+//                        gameFromServer = client.get("/games/${gameSetFromServer?.code}").body()
+//                    } catch (e: NoTransformationFoundException) {
+//                        println("error: ${e.message}")
+//                    }
+//                }
+//            }) {
+//                Text("Get game: ${gameSetFromServer?.code}")
+//            }
+//            Text("the game: ${gameFromServer?.name}")
+//        }
     }
 }
