@@ -3,9 +3,11 @@ package com.holden
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Game(val code: String, val name: String)
+data class Game(
+    val code: String,
+    val name: String,
+    val players: List<Player>
+)
 
 @Serializable
-data class GameForm(val name: String) {
-    fun toGame(code: String) = Game(code, name)
-}
+data class GameForm(val name: String, val dm: PlayerForm)
