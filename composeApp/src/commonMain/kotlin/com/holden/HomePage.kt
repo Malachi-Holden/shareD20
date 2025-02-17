@@ -18,6 +18,9 @@ enum class AppState {
     Home, JoinGame, CreateGame, PlayingGame
 }
 
+/**
+ * Sample view for the app main page
+ */
 @Composable
 fun GamePage() {
     val client = remember { createHttpClient() }
