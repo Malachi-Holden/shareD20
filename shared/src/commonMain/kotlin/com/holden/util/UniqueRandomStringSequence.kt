@@ -5,7 +5,7 @@ import kotlin.random.Random
 fun uniqueRandomStringIterator(
     length: Int,
     random: Random = Random,
-    charList: List<Char> = ('0'..'9') + ('A'..'Z') + ('a'..'z'),
+    charList: List<Char> = ('0'..'9') + ('A'..'Z'),
     hasBeenUsed: (String) -> Boolean
 ): Iterator<String> {
     return generateSequence {

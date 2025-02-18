@@ -81,5 +81,8 @@ fun PlayingGame(
     game: Game
 ) {
     val verb = if (player.isDM) "dming" else "playing"
-    Text("Welcome ${player.name}! You are $verb game ${game.code}")
+    Column {
+        Text("Welcome ${player.name}! You are $verb game ${game.name}")
+        Text("Game code: ${game.code}")
+    }
 }

@@ -1,17 +1,11 @@
 package games
 
 import com.holden.*
-import com.holden.games.GamesTable
-import com.holden.players.PlayersTable
-import com.holden.generateSequentialGameCodes
 import d20TestApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.test.*
 
 class RoutesTests {
@@ -20,21 +14,8 @@ class RoutesTests {
 
     @BeforeTest
     fun setup() {
-        Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", driver = "org.h2.Driver")
-        transaction {
-            SchemaUtils.create(GamesTable)
-            SchemaUtils.create(PlayersTable)
-        }
-        repository = PostgresD20Repository(generateCodes = generateSequentialGameCodes())
+        repository = D20TestRepository()
         testDM = PlayerForm("jack", true, null)
-    }
-
-    @AfterTest
-    fun tearDown() {
-        transaction {
-            SchemaUtils.drop(PlayersTable)
-            SchemaUtils.drop(GamesTable)
-        }
     }
 
     @Test
