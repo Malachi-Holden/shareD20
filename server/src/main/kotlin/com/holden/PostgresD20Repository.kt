@@ -24,13 +24,13 @@ class PostgresD20Repository(
     }
 
     override fun deleteGame(code: String?) = transaction {
-        val game = GameEntity.findById(code ?: throw InvalidGameCode(null))
+        val game = GameEntity.findById(code?.uppercase() ?: throw InvalidGameCode(null))
         game?.delete() ?: throw InvalidGameCode(code)
     }
 
     override fun getGameByCode(code: String?): Game = transaction {
         GameEntity
-            .findById(code ?: throw InvalidGameCode(null))
+            .findById(code?.uppercase() ?: throw InvalidGameCode(null))
             ?.toModel()
             ?: throw InvalidGameCode(code)
     }
@@ -39,12 +39,12 @@ class PostgresD20Repository(
             .findById(playerId ?: throw InvalidPlayerId(null))
             ?: throw InvalidPlayerId(playerId)
         playerEntity.game = GameEntity
-            .findById(gameCode ?: throw InvalidGameCode(null))
+            .findById(gameCode?.uppercase() ?: throw InvalidGameCode(null))
             ?: throw InvalidGameCode(gameCode)
     }
 
     override fun hasGameWithCode(code: String?): Boolean = transaction {
-        GameEntity.findById(code ?: return@transaction false) != null
+        GameEntity.findById(code?.uppercase() ?: return@transaction false) != null
     }
 
     override fun createPlayer(form: PlayerForm): Player = transaction {
@@ -55,7 +55,7 @@ class PostgresD20Repository(
         name = form.name
         isDM = form.isDM
         form.gameCode?.let { code ->
-            GameEntity.findById(code)?.let { entity ->
+            GameEntity.findById(code.uppercase())?.let { entity ->
                 game = entity
             } ?: throw InvalidGameCode(code)
         } ?: throw InvalidGameCode(null)

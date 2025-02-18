@@ -15,7 +15,7 @@ fun JoinGame(onJoin: (PlayerForm) -> Unit) {
     val (code, setCode) = remember { mutableStateOf("") }
     Column {
         TextField(playerName, setPlayerName, placeholder = { Text("Pick a name") })
-        TextField(code, setCode, placeholder = { Text("Enter game code") })
+        TextField(code, { setCode(it.uppercase()) }, placeholder = { Text("Enter game code") })
         Button(onClick = {
             onJoin(PlayerForm(playerName, false, code))
         }) {
