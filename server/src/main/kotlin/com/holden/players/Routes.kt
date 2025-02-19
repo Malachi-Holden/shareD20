@@ -51,14 +51,4 @@ fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
             call.respond(HttpStatusCode.NotFound, e.message ?: "")
         }
     }
-//
-//    delete("/{id}") {
-//        val id = call.pathParameters["id"]?.toInt()
-//        try {
-//            repository.deleteDM(id)
-//            call.respond(HttpStatusCode.NoContent)
-//        } catch (e: InvalidDMId) {
-//            call.respond(HttpStatusCode.NotFound, e.message ?: "")
-//        }
-//    }
 }

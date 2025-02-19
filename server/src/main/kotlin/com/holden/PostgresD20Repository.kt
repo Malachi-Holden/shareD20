@@ -38,14 +38,6 @@ class PostgresD20Repository(
             ?.toModel()
             ?: throw InvalidGameCode(code)
     }
-//    override fun addPlayerToGame(playerId: Int?, gameCode: String?) = transaction {
-//        val playerEntity = PlayerEntity
-//            .findById(playerId ?: throw InvalidPlayerId(null))
-//            ?: throw InvalidPlayerId(playerId)
-//        playerEntity.game = GameEntity
-//            .findById(gameCode?.uppercase() ?: throw InvalidGameCode(null))
-//            ?: throw InvalidGameCode(gameCode)
-//    }
 
     override fun hasGameWithCode(code: String?): Boolean = transaction {
         GameEntity.findById(code?.uppercase() ?: return@transaction false) != null

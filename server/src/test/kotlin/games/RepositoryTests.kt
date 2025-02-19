@@ -57,7 +57,6 @@ class RepositoryTests {
         var game = repository.addGame(GameForm("Hello world", testDM))
         assertEquals(0, game.players.size)
         repository.createPlayer(PlayerForm("john", game.code))
-//        repository.addPlayerToGame(player.id, game.code)
         game = repository.getGameByCode(game.code)
         assertEquals(1, game.players.size)
         assertEquals("john", game.players.last().name)
