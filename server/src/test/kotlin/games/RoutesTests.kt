@@ -14,7 +14,7 @@ class RoutesTests {
 
     @BeforeTest
     fun setup() {
-        repository = D20TestRepository()
+        repository = MockD20Repository()
         testDM = DMForm("jack")
     }
 

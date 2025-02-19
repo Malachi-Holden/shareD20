@@ -14,7 +14,7 @@ fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().
 /**
  * Fake repository that uses an in memory hashmap to replicate database behavior
  */
-class D20TestRepository: D20Repository {
+class MockD20Repository: D20Repository {
     private val games: MutableMap<String, Game> = mutableMapOf()
     private val players: MutableMap<Int, Player> = mutableMapOf()
     private val dms: MutableMap<Int, DM> = mutableMapOf()

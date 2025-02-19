@@ -10,6 +10,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @Preview
 fun App() {
     MaterialTheme {
+        val x = D20ViewModel()
         GamePage()
     }
 }

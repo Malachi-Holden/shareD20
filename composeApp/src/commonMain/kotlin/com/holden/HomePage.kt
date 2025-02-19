@@ -15,7 +15,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.launch
 
 enum class AppState {
-    Home, JoinGame, CreateGame, PlayingGame
+    Home, JoinGame, CreateGame, PlayingGame, DMingGame
 }
 
 /**
@@ -27,6 +27,7 @@ fun GamePage() {
     val serverScope = rememberCoroutineScope()
     var appState by remember { mutableStateOf(AppState.Home) }
     var player: Player? by remember { mutableStateOf(null) }
+    var dm: DM? by remember { mutableStateOf(null) }
     var game: Game? by remember { mutableStateOf(null) }
     when (appState) {
         AppState.Home -> Home(
@@ -50,12 +51,15 @@ fun GamePage() {
                     contentType(ContentType.Application.Json)
                     setBody(form)
                 }.body()
-                player = game?.players?.first { it.isDM }
-                appState = AppState.PlayingGame
+                dm = game?.dm
+                appState = AppState.DMingGame
             }
         })
         AppState.PlayingGame -> {
             PlayingGame(player ?: return, game ?: return)
+        }
+        AppState.DMingGame -> {
+            DMingGame(dm ?: return, game ?: return)
         }
     }
 }
@@ -76,13 +80,23 @@ fun Home(
 }
 
 @Composable
+fun DMingGame(
+    dm: DM,
+    game: Game
+) {
+    Column {
+        Text("Welcome ${dm.name}! You are dming game ${game.name}")
+        Text("Game code: ${game.code}")
+    }
+}
+
+@Composable
 fun PlayingGame(
     player: Player,
     game: Game
 ) {
-    val verb = if (player.isDM) "dming" else "playing"
     Column {
-        Text("Welcome ${player.name}! You are $verb game ${game.name}")
+        Text("Welcome ${player.name}! You are playing game ${game.name}")
         Text("Game code: ${game.code}")
     }
 }

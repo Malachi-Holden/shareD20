@@ -25,10 +25,10 @@ dependencies {
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
     implementation(libs.zaxxer.hikaricp)
+    implementation(libs.h2database)
     testImplementation(libs.ktor.client.core)
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.ktor.client.contentnegotiation)
     testImplementation(libs.ktor.server.core)
     testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.h2database)
 }

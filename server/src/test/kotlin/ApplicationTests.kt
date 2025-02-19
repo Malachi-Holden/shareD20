@@ -1,5 +1,5 @@
 import com.holden.D20Repository
-import com.holden.D20TestRepository
+import com.holden.MockD20Repository
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlin.test.Test
@@ -11,7 +11,7 @@ class ApplicationTests {
 
     @BeforeTest
     fun setup() {
-        repository = D20TestRepository()
+        repository = MockD20Repository()
     }
 
     @Test
