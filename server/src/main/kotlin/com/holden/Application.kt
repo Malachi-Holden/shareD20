@@ -3,6 +3,7 @@ package com.holden
 import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
 import com.holden.players.PlayersTable
+import com.holden.players.dmsRoutes
 import com.holden.players.playersRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -48,5 +49,6 @@ fun Application.module(
         }
         gamesRoutes(repository)
         playersRoutes(repository)
+        dmsRoutes(repository)
     }
 }

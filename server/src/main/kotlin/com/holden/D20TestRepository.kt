@@ -1,5 +1,7 @@
 package com.holden
 
+import com.holden.util.removeAll
+
 fun generateSequentialIds(): Sequence<Int> {
     var current = 0
     return generateSequence {
@@ -15,27 +17,31 @@ fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().
 class D20TestRepository: D20Repository {
     private val games: MutableMap<String, Game> = mutableMapOf()
     private val players: MutableMap<Int, Player> = mutableMapOf()
+    private val dms: MutableMap<Int, DM> = mutableMapOf()
     private val generateCodes: Iterator<String> = generateSequentialGameCodes()
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
+    private val generateDMIds: Iterator<Int> = generateSequentialIds().iterator()
 
     override fun addGame(form: GameForm): Game {
         val code = generateCodes.next()
-        val newGame = Game(code, form.name, listOf())
+        val dm = form.dm.toDM(generateDMIds.next(), code)
+        val newGame = Game(code, form.name, dm, listOf())
         games[code] = newGame
-        val dm = form.dm.copy(gameCode = code)
-        createPlayer(dm)
-        return games[code] ?: newGame
+        dms[dm.id] = dm
+        return newGame
     }
 
     override fun deleteGame(code: String?) {
         games.remove(code) ?: InvalidGameCode(code)
+        players.removeAll { _, player -> player.gameCode == code }
+        dms.removeAll { _, dm -> dm.gameCode == code }
     }
 
     override fun getGameByCode(code: String?): Game {
         return games[code] ?: throw InvalidGameCode(code)
     }
 
-    override fun addPlayerToGame(playerId: Int?, gameCode: String?) {
+    private fun addPlayerToGame(playerId: Int?, gameCode: String?) {
         if (playerId == null) throw InvalidPlayerId(null)
         if (gameCode == null) throw InvalidGameCode(null)
         val game = games[gameCode] ?: throw InvalidGameCode(gameCode)
@@ -54,10 +60,10 @@ class D20TestRepository: D20Repository {
 
     override fun createPlayer(form: PlayerForm): Player {
         val id = generatePlayerIds.next()
-        val player = Player(id, form.name, form.isDM, form.gameCode)
+        val player = Player(id, form.name, form.gameCode)
         players[id] = player
         addPlayerToGame(id, form.gameCode)
-        return players[id] ?: player
+        return player
     }
 
     override fun deletePlayer(id: Int?) {
@@ -67,8 +73,15 @@ class D20TestRepository: D20Repository {
     override fun getPlayer(id: Int?): Player {
         return players[id] ?: throw InvalidPlayerId(id)
     }
-
     override fun hasPlayer(id: Int?): Boolean {
         return players.containsKey(id)
+    }
+
+    override fun getDM(id: Int?): DM {
+        return dms[id] ?: throw InvalidDMId(id)
+    }
+
+    override fun hasDM(id: Int?): Boolean {
+        return dms.containsKey(id)
     }
 }

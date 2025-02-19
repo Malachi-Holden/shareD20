@@ -4,6 +4,7 @@ import com.holden.*
 import com.holden.games.GamesTable
 import com.holden.players.PlayersTable
 import com.holden.generateSequentialGameCodes
+import com.holden.players.DMTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -12,7 +13,7 @@ import kotlin.test.*
 class RepositoryTests {
 
     lateinit var repository: D20Repository
-    lateinit var testDM: PlayerForm
+    lateinit var testDM: DMForm
 
     @BeforeTest
     fun setup() {
@@ -20,15 +21,17 @@ class RepositoryTests {
         transaction {
             SchemaUtils.create(GamesTable)
             SchemaUtils.create(PlayersTable)
+            SchemaUtils.create(DMTable)
         }
         repository = PostgresD20Repository(generateCodes = generateSequentialGameCodes())
-        testDM = PlayerForm("jack", true, null)
+        testDM = DMForm("jack")
     }
 
     @AfterTest
     fun tearDown() {
         transaction {
             SchemaUtils.drop(PlayersTable)
+            SchemaUtils.drop(DMTable)
             SchemaUtils.drop(GamesTable)
         }
     }
@@ -50,14 +53,26 @@ class RepositoryTests {
     }
 
     @Test
-    fun `adding a player to a game should correctly add the player`() {
+    fun `creating a player should correctly add the player to the specified game`() {
         var game = repository.addGame(GameForm("Hello world", testDM))
-        assertEquals(1, game.players.size)
-        assertEquals("jack", game.players.first().name)
-        val player = repository.createPlayer(PlayerForm("john", false, game.code))
-        repository.addPlayerToGame(player.id, game.code)
+        assertEquals(0, game.players.size)
+        repository.createPlayer(PlayerForm("john", game.code))
+//        repository.addPlayerToGame(player.id, game.code)
         game = repository.getGameByCode(game.code)
-        assertEquals(2, game.players.size)
+        assertEquals(1, game.players.size)
         assertEquals("john", game.players.last().name)
+    }
+
+    @Test
+    fun `deletegame should delete all its players and its dm`() {
+        val game = repository.addGame(GameForm("Hello world", testDM))
+        assert(repository.hasGameWithCode("00000000"))
+        val player1 = repository.createPlayer(PlayerForm("john", game.code))
+        val player2 = repository.createPlayer(PlayerForm("jane", game.code))
+        val dm = game.dm
+        repository.deleteGame(game.code)
+        assertFalse(repository.hasDM(dm.id))
+        assertFalse(repository.hasPlayer(player1.id))
+        assertFalse(repository.hasPlayer(player2.id))
     }
 }
