@@ -1,9 +1,6 @@
 package com.holden.players
 
-import com.holden.D20Repository
-import com.holden.InvalidGameCode
-import com.holden.InvalidPlayerId
-import com.holden.PlayerForm
+import com.holden.*
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.request.*
@@ -40,6 +37,17 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
             repository.deletePlayer(id)
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidPlayerId) {
+            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+        }
+    }
+}
+
+fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
+    get("/{id}") {
+        val id = call.pathParameters["id"]?.toInt()
+        try {
+            call.respond(repository.getDM(id))
+        } catch (e: InvalidDMId) {
             call.respond(HttpStatusCode.NotFound, e.message ?: "")
         }
     }

@@ -2,6 +2,7 @@ package com.holden
 
 import com.holden.games.GameEntity
 import com.holden.games.toModel
+import com.holden.players.DMEntity
 import com.holden.players.PlayerEntity
 import com.holden.players.toModel
 import com.holden.util.uniqueRandomStringIterator
@@ -15,12 +16,15 @@ class PostgresD20Repository(
     }
 ): D20Repository {
     override fun addGame(form: GameForm): Game = transaction {
-        val game = GameEntity.new(generateCodes.next()) {
+        val code = generateCodes.next()
+        val newGame = GameEntity.new(code) {
             name = form.name
         }
-        val dm = form.dm.copy(gameCode = game.code.value)
-        createPlayerInTransaction(dm).game = game
-        game.toModel()
+        DMEntity.new {
+            name = form.dm.name
+            game = newGame
+        }
+        newGame.toModel()
     }
 
     override fun deleteGame(code: String?) = transaction {
@@ -34,31 +38,18 @@ class PostgresD20Repository(
             ?.toModel()
             ?: throw InvalidGameCode(code)
     }
-    override fun addPlayerToGame(playerId: Int?, gameCode: String?) = transaction {
-        val playerEntity = PlayerEntity
-            .findById(playerId ?: throw InvalidPlayerId(null))
-            ?: throw InvalidPlayerId(playerId)
-        playerEntity.game = GameEntity
-            .findById(gameCode?.uppercase() ?: throw InvalidGameCode(null))
-            ?: throw InvalidGameCode(gameCode)
-    }
 
     override fun hasGameWithCode(code: String?): Boolean = transaction {
         GameEntity.findById(code?.uppercase() ?: return@transaction false) != null
     }
 
     override fun createPlayer(form: PlayerForm): Player = transaction {
-       createPlayerInTransaction(form).toModel()
-    }
-
-    private fun createPlayerInTransaction(form: PlayerForm): PlayerEntity = PlayerEntity.new {
-        name = form.name
-        isDM = form.isDM
-        form.gameCode?.let { code ->
-            GameEntity.findById(code.uppercase())?.let { entity ->
-                game = entity
-            } ?: throw InvalidGameCode(code)
-        } ?: throw InvalidGameCode(null)
+        PlayerEntity.new {
+            name = form.name
+            game = GameEntity
+                .findById(form.gameCode.uppercase())
+                ?: throw InvalidGameCode(form.gameCode)
+        }.toModel()
     }
 
     override fun deletePlayer(id: Int?) = transaction {
@@ -75,5 +66,16 @@ class PostgresD20Repository(
 
     override fun hasPlayer(id: Int?): Boolean = transaction {
         PlayerEntity.findById(id ?: return@transaction false) != null
+    }
+
+    override fun getDM(id: Int?): DM = transaction {
+        DMEntity
+            .findById(id ?: throw InvalidDMId(null))
+            ?.toModel()
+            ?: throw InvalidDMId(id)
+    }
+
+    override fun hasDM(id: Int?): Boolean = transaction {
+        DMEntity.findById(id ?: return@transaction false) != null
     }
 }
