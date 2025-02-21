@@ -24,37 +24,13 @@ enum class AppState2 {
 fun GamePage(
     viewModel: D20ViewModel
 ) {
-    val client = remember { createHttpClient() }
-    val serverScope = rememberCoroutineScope()
-//    var appState by remember { mutableStateOf(AppState2.Home) }
-//    var player: Player? by remember { mutableStateOf(null) }
-//    var dm: DM? by remember { mutableStateOf(null) }
-//    var game: Game? by remember { mutableStateOf(null) }
     when (val appState = viewModel.appState) {
         is AppState.Home -> Home(
             goToCreate = viewModel::goToCreateGame,
             goToJoin = viewModel::goToJoinGame
         )
-        is AppState.JoinGame -> JoinGame(onJoin = { form ->
-            serverScope.launch {
-                val playerFromServer: Player = client.post("/players") {
-                    contentType(ContentType.Application.Json)
-                    setBody(form)
-                }.body()
-                val game: Game = client.get("/games/${playerFromServer.gameCode}").body()
-                viewModel.goToPlayingGame(playerFromServer, game)
-            }
-        })
-        is AppState.CreateGame -> CreateGame(onCreateGame = { form ->
-            serverScope.launch {
-                val game: Game  = client.post("/games") {
-                    contentType(ContentType.Application.Json)
-                    setBody(form)
-                }.body()
-                val dm = game?.dm
-                viewModel.goToDMingGame(dm, game)
-            }
-        })
+        is AppState.JoinGame -> JoinGame(onJoin = viewModel::onJoin)
+        is AppState.CreateGame -> CreateGame(onCreateGame = viewModel::onCreateGame)
         is AppState.PlayingGame -> {
             PlayingGame(appState.player, appState.game)
         }

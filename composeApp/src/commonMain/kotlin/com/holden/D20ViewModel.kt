@@ -3,7 +3,9 @@ package com.holden
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 class D20ViewModel(
     val repository: D20Repository
@@ -12,6 +14,22 @@ class D20ViewModel(
     val appState: AppState
         @Composable
         get() = _appState.collectAsState().value
+
+    fun onJoin(form: PlayerForm) {
+        viewModelScope.launch {
+            val playerFromServer: Player = repository.createPlayer(form)
+            val game: Game = repository.getGameByCode(form.gameCode)
+            goToPlayingGame(playerFromServer, game)
+        }
+    }
+
+    fun onCreateGame(form: GameForm) {
+        viewModelScope.launch {
+            val game: Game = repository.addGame(form)
+            val dm = game.dm
+            goToDMingGame(dm, game)
+        }
+    }
 
     fun goToCreateGame() {
         _appState.value = AppState.CreateGame

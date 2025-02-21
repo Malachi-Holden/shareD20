@@ -22,7 +22,7 @@ class MockD20Repository: D20Repository {
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
     private val generateDMIds: Iterator<Int> = generateSequentialIds().iterator()
 
-    override fun addGame(form: GameForm): Game {
+    override suspend fun addGame(form: GameForm): Game {
         val code = generateCodes.next()
         val dm = form.dm.toDM(generateDMIds.next(), code)
         val newGame = Game(code, form.name, dm, listOf())
@@ -31,13 +31,13 @@ class MockD20Repository: D20Repository {
         return newGame
     }
 
-    override fun deleteGame(code: String?) {
+    override suspend fun deleteGame(code: String?) {
         games.remove(code) ?: InvalidGameCode(code)
         players.removeAll { _, player -> player.gameCode == code }
         dms.removeAll { _, dm -> dm.gameCode == code }
     }
 
-    override fun getGameByCode(code: String?): Game {
+    override suspend fun getGameByCode(code: String?): Game {
         return games[code] ?: throw InvalidGameCode(code)
     }
 
@@ -54,11 +54,11 @@ class MockD20Repository: D20Repository {
         )
     }
 
-    override fun hasGameWithCode(code: String?): Boolean {
+    override suspend fun hasGameWithCode(code: String?): Boolean {
         return games.contains(code)
     }
 
-    override fun createPlayer(form: PlayerForm): Player {
+    override suspend fun createPlayer(form: PlayerForm): Player {
         val id = generatePlayerIds.next()
         val player = Player(id, form.name, form.gameCode)
         players[id] = player
@@ -66,22 +66,22 @@ class MockD20Repository: D20Repository {
         return player
     }
 
-    override fun deletePlayer(id: Int?) {
+    override suspend fun deletePlayer(id: Int?) {
         players.remove(id) ?: throw InvalidPlayerId(id)
     }
 
-    override fun getPlayer(id: Int?): Player {
+    override suspend fun getPlayer(id: Int?): Player {
         return players[id] ?: throw InvalidPlayerId(id)
     }
-    override fun hasPlayer(id: Int?): Boolean {
+    override suspend fun hasPlayer(id: Int?): Boolean {
         return players.containsKey(id)
     }
 
-    override fun getDM(id: Int?): DM {
+    override suspend fun getDM(id: Int?): DM {
         return dms[id] ?: throw InvalidDMId(id)
     }
 
-    override fun hasDM(id: Int?): Boolean {
+    override suspend fun hasDM(id: Int?): Boolean {
         return dms.containsKey(id)
     }
 }

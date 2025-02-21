@@ -7,28 +7,28 @@ interface D20Repository {
      * @param form Describes the game to be added
      * @return The game that was added to the repository
      */
-    fun addGame(form: GameForm): Game
+    suspend fun addGame(form: GameForm): Game
 
     /**
      * Attempts to delete a game
      * @param code The code of the game to delete
      * @throws [InvalidGameCode] if [code] is null or doesn't exist in the repository
      */
-    fun deleteGame(code: String?)
+    suspend fun deleteGame(code: String?)
 
     /**
      * Gets a game from the repository
      * @param code The code of the game to get
      * @throws [InvalidGameCode] if [code] is null or doesn't exist in the repository
      */
-    fun getGameByCode(code: String?): Game
+    suspend fun getGameByCode(code: String?): Game
 
     /**
      * Checks if a game exists in the repository
      * @param code The code to check
      * @return [true] if the game exists, [false] otherwise
      */
-    fun hasGameWithCode(code: String?): Boolean
+    suspend fun hasGameWithCode(code: String?): Boolean
 
     /**
      * Attempts to create a player
@@ -36,14 +36,14 @@ interface D20Repository {
      * @throws [InvalidPlayerId] if the provided id doesn't exist in the repository
      * @return The player that was added to the repository
      */
-    fun createPlayer(form: PlayerForm): Player
+    suspend fun createPlayer(form: PlayerForm): Player
 
     /**
      * Attempts to delete a player
      * @param id Id of the player to delete
      * @throws [InvalidPlayerId] if [id] is null or doesn't exist in the repository
      */
-    fun deletePlayer(id: Int?)
+    suspend fun deletePlayer(id: Int?)
 
     /**
      * Gets a player from the repository
@@ -51,14 +51,14 @@ interface D20Repository {
      * @throws [InvalidPlayerId] if [id] is null or doesn't exist in the repository
      * @return The player
      */
-    fun getPlayer(id: Int?): Player
+    suspend fun getPlayer(id: Int?): Player
 
     /**
      * Checks if a player exists in the repository
      * @param id Id of the player to check
      * @return [true] if the player exists, [false] otherwise
      */
-    fun hasPlayer(id: Int?): Boolean
+    suspend fun hasPlayer(id: Int?): Boolean
 
     /**
      * Gets a DM from the repository
@@ -66,12 +66,12 @@ interface D20Repository {
      * @throws [InvalidDMId] if [id] is null or doesn't exist in the repository
      * @return The DM
      */
-    fun getDM(id: Int?): DM
+    suspend fun getDM(id: Int?): DM
 
     /**
      * Checks if a DM exists in the repository
      * @param id Id of the DM to check
      * @return [true] if the DM exists, [false] otherwise
      */
-    fun hasDM(id: Int?): Boolean
+    suspend fun hasDM(id: Int?): Boolean
 }
