@@ -43,11 +43,11 @@ kotlin {
     
     sourceSets {
         val desktopMain by getting
-        val ktorVersion = "3.0.3"
         
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {
