@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Preview
 fun App() {
     MaterialTheme {
-//        val viewModel: D20ViewModel = viewModel { D20ViewModel() }
-        GamePage()
+        val viewModel: D20ViewModel = viewModel { D20ViewModel(MockD20Repository()) }
+        GamePage(viewModel)
     }
 }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import com.holden.dm.CreateGame
@@ -14,7 +13,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 
-enum class AppState {
+enum class AppState2 {
     Home, JoinGame, CreateGame, PlayingGame, DMingGame
 }
 
@@ -22,44 +21,48 @@ enum class AppState {
  * Sample view for the app main page
  */
 @Composable
-fun GamePage() {
+fun GamePage(
+    viewModel: D20ViewModel
+) {
     val client = remember { createHttpClient() }
     val serverScope = rememberCoroutineScope()
-    var appState by remember { mutableStateOf(AppState.Home) }
-    var player: Player? by remember { mutableStateOf(null) }
-    var dm: DM? by remember { mutableStateOf(null) }
-    var game: Game? by remember { mutableStateOf(null) }
-    when (appState) {
-        AppState.Home -> Home(
-            goToCreate = { appState = AppState.CreateGame },
-            goToJoin = { appState = AppState.JoinGame }
+//    var appState by remember { mutableStateOf(AppState2.Home) }
+//    var player: Player? by remember { mutableStateOf(null) }
+//    var dm: DM? by remember { mutableStateOf(null) }
+//    var game: Game? by remember { mutableStateOf(null) }
+    when (val appState = viewModel.appState) {
+        is AppState.Home -> Home(
+            goToCreate = viewModel::goToCreateGame,
+            goToJoin = viewModel::goToJoinGame
         )
-        AppState.JoinGame -> JoinGame(onJoin = { form ->
+        is AppState.JoinGame -> JoinGame(onJoin = { form ->
             serverScope.launch {
                 val playerFromServer: Player = client.post("/players") {
                     contentType(ContentType.Application.Json)
                     setBody(form)
                 }.body()
-                game = client.get("/games/${playerFromServer.gameCode}").body()
-                player = playerFromServer
-                appState = AppState.PlayingGame
+                val game: Game = client.get("/games/${playerFromServer.gameCode}").body()
+                viewModel.goToPlayingGame(playerFromServer, game)
             }
         })
-        AppState.CreateGame -> CreateGame(onCreateGame = { form ->
+        is AppState.CreateGame -> CreateGame(onCreateGame = { form ->
             serverScope.launch {
-                game = client.post("/games") {
+                val game: Game  = client.post("/games") {
                     contentType(ContentType.Application.Json)
                     setBody(form)
                 }.body()
-                dm = game?.dm
-                appState = AppState.DMingGame
+                val dm = game?.dm
+                viewModel.goToDMingGame(dm, game)
             }
         })
-        AppState.PlayingGame -> {
-            PlayingGame(player ?: return, game ?: return)
+        is AppState.PlayingGame -> {
+            PlayingGame(appState.player, appState.game)
         }
-        AppState.DMingGame -> {
-            DMingGame(dm ?: return, game ?: return)
+        is AppState.DMingGame -> {
+            DMingGame(appState.dm, appState.game)
+        }
+        is AppState.FailedState -> {
+            Text("Failed")
         }
     }
 }
