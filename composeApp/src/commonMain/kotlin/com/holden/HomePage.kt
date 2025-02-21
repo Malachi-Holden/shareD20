@@ -13,10 +13,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 
-enum class AppState2 {
-    Home, JoinGame, CreateGame, PlayingGame, DMingGame
-}
-
 /**
  * Sample view for the app main page
  */
@@ -37,8 +33,8 @@ fun GamePage(
         is AppState.DMingGame -> {
             DMingGame(appState.dm, appState.game)
         }
-        is AppState.FailedState -> {
-            Text("Failed")
+        is AppState.ErrorState -> {
+            Text("Error: ${appState.error.message}")
         }
     }
 }

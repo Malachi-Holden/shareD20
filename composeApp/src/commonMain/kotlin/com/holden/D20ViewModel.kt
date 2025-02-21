@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.io.IOException
 
 class D20ViewModel(
     val repository: D20Repository
@@ -17,9 +18,15 @@ class D20ViewModel(
 
     fun onJoin(form: PlayerForm) {
         viewModelScope.launch {
-            val playerFromServer: Player = repository.createPlayer(form)
-            val game: Game = repository.getGameByCode(form.gameCode)
-            goToPlayingGame(playerFromServer, game)
+            try {
+                val playerFromServer: Player = repository.createPlayer(form)
+                val game: Game = repository.getGameByCode(form.gameCode)
+                goToPlayingGame(playerFromServer, game)
+            } catch (e: InvalidGameCode) {
+                _appState.value = AppState.ErrorState(e)
+            } catch (e: IOException) {
+                _appState.value = AppState.ErrorState(e)
+            }
         }
     }
 
@@ -39,25 +46,12 @@ class D20ViewModel(
         _appState.value = AppState.JoinGame
     }
 
-    fun goToPlayingGame(player: Player?, game: Game?) {
-        if (player == null || game == null) {
-            goToFailedState()
-            return
-        }
+    fun goToPlayingGame(player: Player, game: Game) {
         _appState.value = AppState.PlayingGame(player, game)
     }
 
-    fun goToDMingGame(dm: DM?, game: Game?) {
-        if (dm == null || game == null) {
-            goToFailedState()
-            return
-        }
+    fun goToDMingGame(dm: DM, game: Game) {
         _appState.value = AppState.DMingGame(dm, game)
-    }
-
-    fun goToFailedState() {
-
-        _appState.value = AppState.FailedState
     }
 }
 
@@ -67,5 +61,5 @@ sealed class AppState {
     object CreateGame: AppState()
     data class PlayingGame(val player: Player, val game: Game): AppState()
     data class DMingGame(val dm: DM, val game: Game): AppState()
-    object FailedState: AppState()
+    data class ErrorState(val error: Exception): AppState()
 }
