@@ -18,7 +18,7 @@ class ClientRepository(val client: HttpClient): D20Repository {
     }
 
     override suspend fun getGameByCode(code: String?): Game {
-        TODO("Not yet implemented")
+        return client.get("/games/$code").body()
     }
 
     override suspend fun hasGameWithCode(code: String?): Boolean {
@@ -26,7 +26,10 @@ class ClientRepository(val client: HttpClient): D20Repository {
     }
 
     override suspend fun createPlayer(form: PlayerForm): Player {
-        TODO("Not yet implemented")
+        return client.post("/players") {
+            contentType(ContentType.Application.Json)
+            setBody(form)
+        }.body()
     }
 
     override suspend fun deletePlayer(id: Int?) {
