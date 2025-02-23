@@ -14,7 +14,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
             val newPlayer = repository.createPlayer(form)
             call.respond(newPlayer)
         } catch (e: InvalidGameCode) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
         } catch (ex: IllegalStateException) {
             call.respond(HttpStatusCode.BadRequest)
         } catch (ex: JsonConvertException) {
@@ -27,7 +27,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
         try {
             call.respond(repository.getPlayer(id))
         } catch (e: InvalidPlayerId) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }
     }
 
@@ -37,7 +37,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
             repository.deletePlayer(id)
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidPlayerId) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }
     }
 }
@@ -48,7 +48,7 @@ fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
         try {
             call.respond(repository.getDM(id))
         } catch (e: InvalidDMId) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidDMId")
         }
     }
 }

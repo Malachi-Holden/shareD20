@@ -98,7 +98,7 @@ class RoutesTests {
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
 
-        assertEquals("No game found with code 66666666", response.bodyAsText())
+        assertEquals("InvalidGameCode", response.bodyAsText())
     }
 
     @Test

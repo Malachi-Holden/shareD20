@@ -16,26 +16,30 @@ class ClientRepository(val client: HttpClient): D20Repository {
     }
 
     override suspend fun deleteGame(code: String?) {
-        TODO("Not yet implemented")
+        if (code == null) {
+            throw InvalidGameCode(null)
+        }
+        val response = client.delete("/games/$code")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, code, null)
+        }
     }
 
     override suspend fun getGameByCode(code: String?): Game {
         val response = client.get("/games/$code")
-        when (response.status) {
-            HttpStatusCode.OK -> {
-                return response.body()
-            }
-            HttpStatusCode.NotFound -> {
-                throw InvalidGameCode(code)
-            }
-            else -> {
-                throw getHttpError(response)
-            }
+        if (response.status.isSuccess()) {
+            return response.body()
         }
+        throw getHttpError(response, code, null)
     }
 
     override suspend fun hasGameWithCode(code: String?): Boolean {
-        TODO("Not yet implemented")
+        return try {
+            getGameByCode(code)
+            true
+        } catch (e: InvalidGameCode) {
+            false
+        }
     }
 
     override suspend fun createPlayer(form: PlayerForm): Player {
@@ -43,40 +47,79 @@ class ClientRepository(val client: HttpClient): D20Repository {
             contentType(ContentType.Application.Json)
             setBody(form)
         }
-        when (response.status) {
-            HttpStatusCode.OK -> return response.body()
-            HttpStatusCode.NotFound -> throw InvalidGameCode(form.gameCode)
-            else -> {
-                throw getHttpError(response)
-            }
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, form.gameCode, null)
         }
+        return response.body()
     }
 
     override suspend fun deletePlayer(id: Int?) {
-        TODO("Not yet implemented")
+        if (id == null) {
+            throw InvalidPlayerId(null)
+        }
+        val response = client.delete("/players/$id")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, null, id)
+        }
     }
 
     override suspend fun getPlayer(id: Int?): Player {
-        TODO("Not yet implemented")
+        if (id == null) {
+            throw InvalidPlayerId(null)
+        }
+        val response = client.get("/players/$id")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, null, id)
+        }
+        return response.body()
     }
 
     override suspend fun hasPlayer(id: Int?): Boolean {
-        TODO("Not yet implemented")
+        return try {
+            getPlayer(id)
+            true
+        } catch (e: InvalidPlayerId) {
+            false
+        }
     }
 
     override suspend fun getDM(id: Int?): DM {
-        TODO("Not yet implemented")
+        if (id == null) {
+            throw InvalidDMId(null)
+        }
+        val response = client.get("/dms/$id")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, null, id)
+        }
+        return response.body()
     }
 
     override suspend fun hasDM(id: Int?): Boolean {
-        TODO("Not yet implemented")
+        return try {
+            getDM(id)
+            true
+        } catch (e: InvalidDMId) {
+            false
+        }
     }
 
-    suspend fun getHttpError(response: HttpResponse): Exception {
-        return if (response.status == HttpStatusCode.InternalServerError) {
-            InternalServerError(response.bodyAsText())
-        } else {
-            GenericHttpError(response.bodyAsText())
+    private suspend fun getHttpError(
+        response: HttpResponse,
+        code: String?,
+        id: Int?
+    ): Exception {
+        return when (response.status) {
+            HttpStatusCode.NotFound -> {
+                when (response.bodyAsText()) {
+                    "InvalidGameCode" -> InvalidGameCode(code)
+                    "InvalidPlayerId" -> InvalidPlayerId(id)
+                    "InvalidDMId" -> InvalidDMId(id)
+                    "NoDMFoundWithGameCode" -> InvalidGameCode(code)
+                    else -> GenericHttpError("")
+                }
+            }
+            HttpStatusCode.InternalServerError -> InternalServerError(response.bodyAsText())
+            else -> GenericHttpError(response.bodyAsText())
         }
     }
 }

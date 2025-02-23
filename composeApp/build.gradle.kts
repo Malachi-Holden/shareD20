@@ -63,6 +63,7 @@ kotlin {
             implementation(libs.ktor.client.contentnegotiation)
             implementation(libs.ktor.client.json)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -71,6 +72,12 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.wasm)
+        }
+        commonTest.dependencies {
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.tests)
+            implementation(libs.ktor.client.contentnegotiation)
+            implementation(libs.kotlin.test.junit)
         }
     }
 }

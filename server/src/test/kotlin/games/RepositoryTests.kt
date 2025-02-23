@@ -5,6 +5,7 @@ import com.holden.games.GamesTable
 import com.holden.players.PlayersTable
 import com.holden.generateSequentialGameCodes
 import com.holden.players.DMTable
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -37,7 +38,7 @@ class RepositoryTests {
     }
 
     @Test
-    fun `addgame should create a game with the correct attributes`() {
+    fun `addgame should create a game with the correct attributes`() = runBlocking {
         val game = repository.addGame(GameForm("Hello world", testDM))
         assertEquals("00000000" to "Hello world", game.code to game.name)
         val gottenGame = repository.getGameByCode("00000000")
@@ -45,7 +46,7 @@ class RepositoryTests {
     }
 
     @Test
-    fun `deletegame should remove the game`() {
+    fun `deletegame should remove the game`() = runBlocking {
         repository.addGame(GameForm("Hello world", testDM))
         assert(repository.hasGameWithCode("00000000"))
         repository.deleteGame("00000000")
@@ -53,7 +54,7 @@ class RepositoryTests {
     }
 
     @Test
-    fun `creating a player should correctly add the player to the specified game`() {
+    fun `creating a player should correctly add the player to the specified game`() = runBlocking {
         var game = repository.addGame(GameForm("Hello world", testDM))
         assertEquals(0, game.players.size)
         repository.createPlayer(PlayerForm("john", game.code))
@@ -63,7 +64,7 @@ class RepositoryTests {
     }
 
     @Test
-    fun `deletegame should delete all its players and its dm`() {
+    fun `deletegame should delete all its players and its dm`() = runBlocking {
         val game = repository.addGame(GameForm("Hello world", testDM))
         assert(repository.hasGameWithCode("00000000"))
         val player1 = repository.createPlayer(PlayerForm("john", game.code))
