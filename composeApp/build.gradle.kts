@@ -74,10 +74,9 @@ kotlin {
             implementation(libs.ktor.client.wasm)
         }
         commonTest.dependencies {
-            implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.tests)
-            implementation(libs.ktor.client.contentnegotiation)
             implementation(libs.kotlin.test.junit)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

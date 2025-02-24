@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 
-
 class ClientRepository(val client: HttpClient): D20Repository {
     override suspend fun addGame(form: GameForm): Game {
         return client.post("/games") {
