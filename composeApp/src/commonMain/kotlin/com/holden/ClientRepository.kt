@@ -107,9 +107,10 @@ class ClientRepository(val client: HttpClient): D20Repository {
         code: String?,
         id: Int?
     ): Exception {
+        val body = response.bodyAsText()
         return when (response.status) {
             HttpStatusCode.NotFound -> {
-                when (response.bodyAsText()) {
+                when (body) {
                     "InvalidGameCode" -> InvalidGameCode(code)
                     "InvalidPlayerId" -> InvalidPlayerId(id)
                     "InvalidDMId" -> InvalidDMId(id)

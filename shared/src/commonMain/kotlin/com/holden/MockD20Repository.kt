@@ -32,7 +32,7 @@ class MockD20Repository: D20Repository {
     }
 
     override suspend fun deleteGame(code: String?) {
-        games.remove(code) ?: InvalidGameCode(code)
+        games.remove(code) ?: throw InvalidGameCode(code)
         players.removeAll { _, player -> player.gameCode == code }
         dms.removeAll { _, dm -> dm.gameCode == code }
     }

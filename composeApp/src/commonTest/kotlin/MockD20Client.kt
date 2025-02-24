@@ -15,28 +15,28 @@ class MockD20Client(
 ) {
     val httpClient = HttpClient(
         engine = MockEngine { request ->
+            val pathSegments = request.url.segments
             val bodyText = (request.body as? TextContent)?.text
-            val params = request.url.parameters
-            when (request.url.encodedPath) {
-                "/games" -> {
+            when (pathSegments.first()) {
+                "games" -> {
                     when (request.method) {
                         HttpMethod.Post -> postGame(bodyText)
-                        HttpMethod.Get -> getGame(params)
-                        HttpMethod.Delete -> deleteGame(params)
+                        HttpMethod.Get -> getGame(pathSegments)
+                        HttpMethod.Delete -> deleteGame(pathSegments)
                         else -> error("Unrecognized method ${request.method} for endpoint ${request.url.encodedPath}")
                     }
                 }
-                "/players" -> {
+                "players" -> {
                     when (request.method) {
                         HttpMethod.Post -> postPlayer(bodyText)
-                        HttpMethod.Get -> getPlayer(params)
-                        HttpMethod.Delete -> deletePlayer(params)
+                        HttpMethod.Get -> getPlayer(pathSegments)
+                        HttpMethod.Delete -> deletePlayer(pathSegments)
                         else -> error("Unrecognized method ${request.method} for endpoint ${request.url.encodedPath}")
                     }
                 }
-                "/dms" -> {
+                "dms" -> {
                     when (request.method) {
-                        HttpMethod.Get -> getDM(params)
+                        HttpMethod.Get -> getDM(pathSegments)
                         else -> error("Unrecognized method ${request.method} for endpoint ${request.url.encodedPath}")
                     }
                 }
@@ -56,7 +56,7 @@ class MockD20Client(
     )
 
     fun MockRequestHandleScope.notFound(message: String) = respond(
-        content = """{"error": "$message"""",
+        content = message,
         status = HttpStatusCode.NotFound,
         headers = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
     )
@@ -79,22 +79,22 @@ class MockD20Client(
         return success(game)
     }
 
-    private suspend fun MockRequestHandleScope.getGame(parameters: Parameters): HttpResponseData {
-        val code = parameters["code"] ?: return failedToParse()
+    private suspend fun MockRequestHandleScope.getGame(pathSegments: List<String>): HttpResponseData {
+        val code = pathSegments.getOrNull(1) ?: return failedToParse()
         val game = try {
             serverRepository.getGameByCode(code)
         } catch (e: InvalidGameCode) {
-            return notFound(e.message ?: "")
+            return notFound("InvalidGameCode")
         }
         return success(game)
     }
 
-    private suspend fun MockRequestHandleScope.deleteGame(parameters: Parameters): HttpResponseData {
-        val code = parameters["code"] ?: return failedToParse()
+    private suspend fun MockRequestHandleScope.deleteGame(pathSegments: List<String>): HttpResponseData {
+        val code = pathSegments.getOrNull(1) ?: return failedToParse()
         try {
             serverRepository.deleteGame(code)
         } catch (e: InvalidGameCode) {
-            return notFound(e.message ?: "")
+            return notFound("InvalidGameCode")
         }
         return noContent()
     }
@@ -105,32 +105,32 @@ class MockD20Client(
         return success(player)
     }
 
-    private suspend fun MockRequestHandleScope.getPlayer(parameters: Parameters): HttpResponseData {
-        val id = parameters["id"]?.toIntOrNull() ?: return failedToParse()
+    private suspend fun MockRequestHandleScope.getPlayer(pathSegments: List<String>): HttpResponseData {
+        val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
         val player = try {
             serverRepository.getPlayer(id)
         } catch (e: InvalidPlayerId) {
-            return notFound(e.message ?: "")
+            return notFound("InvalidPlayerId")
         }
         return success(player)
     }
 
-    private suspend fun MockRequestHandleScope.deletePlayer(parameters: Parameters): HttpResponseData {
-        val id = parameters["id"]?.toIntOrNull() ?: return failedToParse()
+    private suspend fun MockRequestHandleScope.deletePlayer(pathSegments: List<String>): HttpResponseData {
+        val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
         try {
             serverRepository.deletePlayer(id)
         } catch (e: InvalidPlayerId) {
-            return notFound(e.message ?: "")
+            return notFound("InvalidPlayerId")
         }
         return noContent()
     }
 
-    private suspend fun MockRequestHandleScope.getDM(parameters: Parameters): HttpResponseData {
-        val id = parameters["id"]?.toIntOrNull() ?: return failedToParse()
+    private suspend fun MockRequestHandleScope.getDM(pathSegments: List<String>): HttpResponseData {
+        val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
         val dm = try {
             serverRepository.getDM(id)
         } catch (e: InvalidDMId) {
-            return notFound(e.message ?: "")
+            return notFound("InvalidDMId")
         }
         return success(dm)
     }
