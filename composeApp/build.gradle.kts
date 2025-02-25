@@ -37,6 +37,11 @@ kotlin {
                     }
                 }
             }
+            testTask {
+                useKarma {
+                    useFirefoxHeadless()
+                }
+            }
         }
         binaries.executable()
     }
@@ -75,7 +80,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.ktor.client.tests)
-            implementation(libs.kotlin.test.junit)
+            implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
         }
     }

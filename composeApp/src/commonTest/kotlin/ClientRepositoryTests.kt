@@ -5,6 +5,7 @@ import kotlin.test.*
 class ClientRepositoryTests {
     lateinit var mockD20Client: MockD20Client
     lateinit var clientRepository: D20Repository
+
     @BeforeTest
     fun setup() {
         mockD20Client = MockD20Client()
