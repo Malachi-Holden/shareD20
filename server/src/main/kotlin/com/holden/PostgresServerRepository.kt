@@ -15,7 +15,7 @@ class PostgresD20Repository(
         GameEntity.findById(code) != null
     }
 ): D20Repository {
-    override fun addGame(form: GameForm): Game = transaction {
+    override suspend fun addGame(form: GameForm): Game = transaction {
         val code = generateCodes.next()
         val newGame = GameEntity.new(code) {
             name = form.name
@@ -27,23 +27,23 @@ class PostgresD20Repository(
         newGame.toModel()
     }
 
-    override fun deleteGame(code: String?) = transaction {
+    override suspend fun deleteGame(code: String?) = transaction {
         val game = GameEntity.findById(code?.uppercase() ?: throw InvalidGameCode(null))
         game?.delete() ?: throw InvalidGameCode(code)
     }
 
-    override fun getGameByCode(code: String?): Game = transaction {
+    override suspend fun getGameByCode(code: String?): Game = transaction {
         GameEntity
             .findById(code?.uppercase() ?: throw InvalidGameCode(null))
             ?.toModel()
             ?: throw InvalidGameCode(code)
     }
 
-    override fun hasGameWithCode(code: String?): Boolean = transaction {
+    override suspend fun hasGameWithCode(code: String?): Boolean = transaction {
         GameEntity.findById(code?.uppercase() ?: return@transaction false) != null
     }
 
-    override fun createPlayer(form: PlayerForm): Player = transaction {
+    override suspend fun createPlayer(form: PlayerForm): Player = transaction {
         PlayerEntity.new {
             name = form.name
             game = GameEntity
@@ -52,30 +52,30 @@ class PostgresD20Repository(
         }.toModel()
     }
 
-    override fun deletePlayer(id: Int?) = transaction {
+    override suspend fun deletePlayer(id: Int?) = transaction {
         val player = PlayerEntity.findById(id ?: throw InvalidPlayerId(null))
         player?.delete() ?: throw InvalidPlayerId(id)
     }
 
-    override fun getPlayer(id: Int?): Player = transaction {
+    override suspend fun getPlayer(id: Int?): Player = transaction {
         PlayerEntity
             .findById(id ?: throw InvalidPlayerId(null))
             ?.toModel()
             ?: throw InvalidPlayerId(id)
     }
 
-    override fun hasPlayer(id: Int?): Boolean = transaction {
+    override suspend fun hasPlayer(id: Int?): Boolean = transaction {
         PlayerEntity.findById(id ?: return@transaction false) != null
     }
 
-    override fun getDM(id: Int?): DM = transaction {
+    override suspend fun getDM(id: Int?): DM = transaction {
         DMEntity
             .findById(id ?: throw InvalidDMId(null))
             ?.toModel()
             ?: throw InvalidDMId(id)
     }
 
-    override fun hasDM(id: Int?): Boolean = transaction {
+    override suspend fun hasDM(id: Int?): Boolean = transaction {
         DMEntity.findById(id ?: return@transaction false) != null
     }
 }

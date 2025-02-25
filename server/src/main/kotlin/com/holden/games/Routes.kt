@@ -27,7 +27,7 @@ fun Routing.gamesRoutes(repository: D20Repository) = route("/games") {
         try {
             call.respond(repository.getGameByCode(code))
         } catch (e: InvalidGameCode) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
         }
     }
 
@@ -37,7 +37,7 @@ fun Routing.gamesRoutes(repository: D20Repository) = route("/games") {
             repository.deleteGame(code)
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidGameCode) {
-            call.respond(HttpStatusCode.NotFound, e.message ?: "")
+            call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
         }
     }
 }

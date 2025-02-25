@@ -17,7 +17,7 @@ fun JoinGame(onJoin: (PlayerForm) -> Unit) {
         TextField(playerName, setPlayerName, placeholder = { Text("Pick a name") })
         TextField(code, { setCode(it.uppercase()) }, placeholder = { Text("Enter game code") })
         Button(onClick = {
-            onJoin(PlayerForm(playerName, false, code))
+            onJoin(PlayerForm(playerName, code))
         }) {
             Text("Join")
         }

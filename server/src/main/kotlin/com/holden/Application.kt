@@ -2,6 +2,7 @@ package com.holden
 
 import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
+import com.holden.players.DMTable
 import com.holden.players.PlayersTable
 import com.holden.players.dmsRoutes
 import com.holden.players.playersRoutes
@@ -14,14 +15,17 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun main() {
-    databaseFactory()
+//    databaseFactory()
+    inMemoryDatabaseFactory()
     transaction {
-        SchemaUtils.create(GamesTable)
         SchemaUtils.create(PlayersTable)
+        SchemaUtils.create(DMTable)
+        SchemaUtils.create(GamesTable)
     }
     embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
         .start(wait = true)

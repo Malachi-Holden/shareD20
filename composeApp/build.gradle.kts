@@ -37,13 +37,17 @@ kotlin {
                     }
                 }
             }
+            testTask {
+                useKarma {
+                    useFirefoxHeadless()
+                }
+            }
         }
         binaries.executable()
     }
     
     sourceSets {
         val desktopMain by getting
-        val ktorVersion = "3.0.3"
         
         androidMain.dependencies {
             implementation(compose.preview)
@@ -63,6 +67,8 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.contentnegotiation)
             implementation(libs.ktor.client.json)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -71,6 +77,11 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.wasm)
+        }
+        commonTest.dependencies {
+            implementation(libs.ktor.client.tests)
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

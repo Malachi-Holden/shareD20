@@ -14,7 +14,7 @@ class RoutesTests {
 
     @BeforeTest
     fun setup() {
-        repository = D20TestRepository()
+        repository = MockD20Repository()
         testDM = DMForm("jack")
     }
 
@@ -26,9 +26,6 @@ class RoutesTests {
         }
         assertEquals(HttpStatusCode.OK, response.status)
         val game = response.body<Game>()
-        assertEquals("hello world" to "00000000", game.name to game.code)
-        assertEquals("jack", game.dm.name)
-        assertEquals("00000000", game.dm.gameCode)
         val gameFromRepo = repository.getGameByCode(game.code)
         assertNotNull(gameFromRepo)
         assertEquals(game, gameFromRepo)
@@ -36,26 +33,40 @@ class RoutesTests {
 
     @Test
     fun `get game should return the correct game`() = d20TestApplication(repository) { client ->
-        repository.addGame(GameForm(name = "hello world", testDM))
-        val response = client.get("/games/00000000")
+        val game = repository.addGame(GameForm(name = "hello world", testDM))
+        val response = client.get("/games/${game.code}")
         assertEquals(HttpStatusCode.OK, response.status)
         val gameFromServer: Game = response.body()
-        assertEquals("hello world" to "00000000", gameFromServer.name to gameFromServer.code)
+        assertEquals(game, gameFromServer)
         assertEquals("jack", gameFromServer.dm.name)
     }
 
     @Test
+    fun `getGame should fail if code is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/games/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidGameCode", response.bodyAsText())
+    }
+
+    @Test
     fun `delete game should remove the correct game`() = d20TestApplication(repository) { client ->
-        repository.addGame(GameForm(name = "hello world", dm = testDM))
-        repository.addGame(GameForm(name = "goodbye world", dm = testDM))
-        assert(repository.hasGameWithCode("00000000"))
-        assert(repository.hasGameWithCode("00000001"))
-        val dmId = repository.getGameByCode("00000000").dm.id
-        val response = client.delete("/games/00000000")
+        val game1 = repository.addGame(GameForm(name = "hello world", dm = testDM))
+        val game2 = repository.addGame(GameForm(name = "goodbye world", dm = testDM))
+        assert(repository.hasGameWithCode(game1.code))
+        assert(repository.hasGameWithCode(game2.code))
+        val dmId = repository.getGameByCode(game1.code).dm.id
+        val response = client.delete("/games/${game1.code}")
         assert(response.status.isSuccess())
-        assertFalse(repository.hasGameWithCode("00000000"))
+        assertFalse(repository.hasGameWithCode(game1.code))
         assertFalse(repository.hasDM(dmId), "Deleting the game should delete the associated DM")
-        assert(repository.hasGameWithCode("00000001"))
+        assert(repository.hasGameWithCode(game2.code))
+    }
+
+    @Test
+    fun `delete game should fail if code is bad`() = d20TestApplication(repository) { client ->
+        val response = client.delete("/games/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidGameCode", response.bodyAsText())
     }
 
     @Test
@@ -98,7 +109,7 @@ class RoutesTests {
         }
         assertEquals(HttpStatusCode.NotFound, response.status)
 
-        assertEquals("No game found with code 66666666", response.bodyAsText())
+        assertEquals("InvalidGameCode", response.bodyAsText())
     }
 
     @Test
@@ -112,11 +123,45 @@ class RoutesTests {
     }
 
     @Test
+    fun `get player should fail if id is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/players/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidPlayerId", response.bodyAsText())
+    }
+
+    @Test
+    fun `delete Player should delete the correct player`() = d20TestApplication(repository) { client ->
+        val testGame = repository.addGame(GameForm("testgame", testDM))
+        val player1 = repository.createPlayer(PlayerForm("Jane", testGame.code))
+        val player2 = repository.createPlayer(PlayerForm("Jill", testGame.code))
+        assert(repository.hasPlayer(player1.id))
+        assert(repository.hasPlayer(player2.id))
+        val response = client.delete("/players/${player1.id}")
+        assert(response.status.isSuccess())
+        assertFalse(repository.hasPlayer(player1.id))
+        assert(repository.hasPlayer(player2.id))
+    }
+
+    @Test
+    fun `delete player should fail if id is bad`() = d20TestApplication(repository) { client ->
+        val response = client.delete("/players/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidPlayerId", response.bodyAsText())
+    }
+
+    @Test
     fun `get DM should return the correct dm`() = d20TestApplication(repository) { client ->
         val testGame = repository.addGame(GameForm(name = "hello world", testDM))
         val response = client.get("/dms/${testGame.dm.id}")
         assertEquals(HttpStatusCode.OK, response.status)
         val gottenDM = response.body<DM>()
         assertEquals(testGame.dm, gottenDM)
+    }
+
+    @Test
+    fun `getDM should fail if id is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/dms/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidDMId", response.bodyAsText())
     }
 }
