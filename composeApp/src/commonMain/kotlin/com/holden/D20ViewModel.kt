@@ -16,6 +16,8 @@ class D20ViewModel(
         @Composable
         get() = _appState.collectAsState().value
 
+    fun getCurrentAppState() = _appState.value
+
     fun onJoin(form: PlayerForm) {
         viewModelScope.launch {
             try {
