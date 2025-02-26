@@ -34,3 +34,18 @@ dependencies {
     testImplementation(libs.ktor.server.core)
     testImplementation(libs.kotlin.test.junit)
 }
+
+var runTempDatabaseArgs = "--tempDatabase=false"
+
+task("runTempDatabase") {
+    doFirst {
+        runTempDatabaseArgs = "--tempDatabase=true"
+    }
+    finalizedBy("run")
+}
+
+tasks.named<JavaExec>("run") {
+    doFirst {
+        args(runTempDatabaseArgs)
+    }
+}

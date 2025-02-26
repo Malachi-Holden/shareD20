@@ -22,9 +22,9 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.qualifier.named
 
-fun main() {
+fun main(args: Array<String>) {
     val koin = initKoin()
-    koin.get<DatabaseFactory>(named(ConnectionType.InMemory)).connect()
+    koin.get<DatabaseFactory>(named(ConnectionType.getFromArgs(args))).connect()
     transaction {
         SchemaUtils.create(PlayersTable)
         SchemaUtils.create(DMTable)

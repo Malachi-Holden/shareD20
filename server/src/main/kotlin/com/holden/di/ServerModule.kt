@@ -10,7 +10,20 @@ fun initKoin() = startKoin {
 }.koin
 
 enum class ConnectionType {
-    InMemory, PostGres
+    InMemory, PostGres;
+
+    companion object {
+        fun getFromArgs(args: Array<String>): ConnectionType {
+            val useTempDatabaseArg = args
+                .firstOrNull { it.startsWith("--tempDatabase=") }
+                ?.removePrefix("--tempDatabase=")
+            return if (useTempDatabaseArg == "true") {
+                InMemory
+            } else {
+                PostGres
+            }
+        }
+    }
 }
 
 val serverModule = module {
