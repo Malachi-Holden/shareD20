@@ -7,14 +7,22 @@ import com.holden.players.PlayerEntity
 import com.holden.players.toModel
 import com.holden.util.uniqueRandomStringIterator
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 val GAME_ID_LENGTH = 8 // in the future this could be set by the administrator
 
-class PostgresD20Repository(
-    private val generateCodes: Iterator<String> = uniqueRandomStringIterator(GAME_ID_LENGTH) { code ->
+object StandardGenerator: GenerateCodes {
+    val generator = uniqueRandomStringIterator(GAME_ID_LENGTH) { code ->
         GameEntity.findById(code) != null
     }
-): D20Repository {
+
+    override fun next(): String = generator.next()
+}
+
+class PostgresD20Repository: D20Repository, KoinComponent {
+    private val generateCodes: GenerateCodes by inject()
     override suspend fun addGame(form: GameForm): Game = transaction {
         val code = generateCodes.next()
         val newGame = GameEntity.new(code) {

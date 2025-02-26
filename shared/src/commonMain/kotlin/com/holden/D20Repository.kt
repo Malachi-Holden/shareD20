@@ -1,5 +1,9 @@
 package com.holden
 
+fun interface GenerateCodes {
+    fun next(): String
+}
+
 interface D20Repository {
 
     /**

@@ -4,21 +4,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.*
 import com.holden.dm.CreateGame
 import com.holden.player.JoinGame
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Sample view for the app main page
  */
 @Composable
 fun GamePage(
-    viewModel: D20ViewModel
+    viewModel: D20ViewModel = koinViewModel()
 ) {
     when (val appState = viewModel.appState) {
         is AppState.Home -> Home(

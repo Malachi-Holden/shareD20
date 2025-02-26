@@ -1,29 +1,50 @@
 import com.holden.*
 import kotlinx.coroutines.test.runTest
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.get
 import kotlin.test.*
 
-class ClientRepositoryTests {
-    lateinit var mockD20Client: MockD20Client
+class ClientRepositoryTests: KoinTest {
+    lateinit var serverRepository: D20Repository
     lateinit var clientRepository: D20Repository
 
     @BeforeTest
     fun setup() {
-        mockD20Client = MockD20Client()
-        clientRepository = ClientRepository(mockD20Client.httpClient)
+        val composeTestModule = module {
+            single <D20Repository> (named("server")){ MockD20Repository() }
+            single { mockHttpClient(get(named("server"))) }
+            single <D20Repository> (named("client")){ ClientRepository() }
+            viewModelOf<D20ViewModel>(constructor = { D20ViewModel() })
+        }
+        startKoin {
+            modules(composeTestModule)
+        }
+        serverRepository = get(named("server"))
+        clientRepository = get(named("client"))
+    }
+
+    @AfterTest
+    fun tearDown() {
+        stopKoin()
     }
 
     @Test
     fun `addGame should correctly add a game to the database`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val gameFromServer = clientRepository.addGame(form)
-        val game = mockD20Client.serverRepository.getGameByCode(gameFromServer.code)
+        val game = serverRepository.getGameByCode(gameFromServer.code)
         assertEquals(game, gameFromServer)
     }
 
     @Test
     fun `getgame should get an existing game`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
-        val game = mockD20Client.serverRepository.addGame(form)
+        val game = serverRepository.addGame(form)
         val gameFromServer = clientRepository.getGameByCode(game.code)
         assertEquals(game, gameFromServer)
     }
@@ -41,9 +62,9 @@ class ClientRepositoryTests {
     @Test
     fun `deleteGame should successfully delete game`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
-        val game = mockD20Client.serverRepository.addGame(form)
+        val game = serverRepository.addGame(form)
         clientRepository.deleteGame(game.code)
-        assertFalse(mockD20Client.serverRepository.hasGameWithCode(game.code))
+        assertFalse(serverRepository.hasGameWithCode(game.code))
     }
 
     @Test
