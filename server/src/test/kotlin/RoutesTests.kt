@@ -1,21 +1,34 @@
-package games
-
 import com.holden.*
-import d20TestApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.get
 import kotlin.test.*
 
-class RoutesTests {
+class RoutesTests: KoinTest {
     lateinit var repository: D20Repository
     lateinit var testDM: DMForm
 
     @BeforeTest
     fun setup() {
-        repository = MockD20Repository()
+        val routesTestModule = module {
+            single<D20Repository> { MockD20Repository() }
+        }
+        startKoin {
+            modules(routesTestModule)
+        }
+        repository = get()
         testDM = DMForm("jack")
+    }
+
+    @AfterTest
+    fun tearDown() {
+        stopKoin()
     }
 
     @Test

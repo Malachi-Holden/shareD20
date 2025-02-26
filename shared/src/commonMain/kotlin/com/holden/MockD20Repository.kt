@@ -12,6 +12,7 @@ fun generateSequentialIds(): Sequence<Int> {
 
 fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().padStart(8, '0') }.iterator()
 
+
 /**
  * Fake repository that uses an in memory hashmap to replicate database behavior
  */

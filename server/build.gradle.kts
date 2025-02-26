@@ -26,6 +26,8 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.zaxxer.hikaricp)
     implementation(libs.h2database)
+    implementation(libs.koin.core)
+    testImplementation(libs.koin.test)
     testImplementation(libs.ktor.client.core)
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.ktor.client.contentnegotiation)

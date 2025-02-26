@@ -1,5 +1,7 @@
 package com.holden
 
+import com.holden.di.ConnectionType
+import com.holden.di.initKoin
 import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
 import com.holden.players.DMTable
@@ -18,21 +20,28 @@ import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.qualifier.named
 
 fun main() {
-//    databaseFactory()
-    inMemoryDatabaseFactory()
+    val koin = initKoin()
+    koin.get<DatabaseFactory>(named(ConnectionType.InMemory)).connect()
     transaction {
         SchemaUtils.create(PlayersTable)
         SchemaUtils.create(DMTable)
         SchemaUtils.create(GamesTable)
     }
-    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
+    val module = repositoryModule(koin.get(), Application::module)
+    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = module)
         .start(wait = true)
 }
 
+fun repositoryModule(
+    repository: D20Repository,
+    module: Application.(D20Repository) -> Unit
+): Application.() -> Unit = { module(repository) }
+
 fun Application.module(
-    repository: D20Repository = PostgresD20Repository()
+    repository: D20Repository
 ) {
     install(CORS){ // to allow testing on localhost
         allowHost("localhost:8081", schemes = listOf("http", "https"))

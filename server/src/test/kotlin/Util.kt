@@ -10,8 +10,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun d20TestApplication(
     repository: D20Repository,
-    block: suspend ApplicationTestBuilder.(HttpClient) -> Unit)
-        = testApplication {
+    block: suspend ApplicationTestBuilder.(HttpClient) -> Unit
+) = testApplication {
     application {
         module(repository)
     }

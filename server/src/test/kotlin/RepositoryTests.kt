@@ -1,5 +1,3 @@
-package games
-
 import com.holden.*
 import com.holden.games.GameEntity
 import com.holden.games.GamesTable
@@ -10,23 +8,39 @@ import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import runTransactionTest
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.test.KoinTest
+import org.koin.test.get
 import kotlin.test.*
 
-class RepositoryTests {
+class MockGenerator: GenerateCodes {
+    val generator = generateSequentialGameCodes()
+    override fun next(): String = generator.next()
+}
+
+class RepositoryTests: KoinTest {
 
     lateinit var repository: D20Repository
     lateinit var testDM: DMForm
 
     @BeforeTest
     fun setup() {
-        Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;", driver = "org.h2.Driver")
+        val repositoryTestModule = org.koin.dsl.module {
+            single<DatabaseFactory> { InMemoryDatabaseFactory }
+            single<GenerateCodes> { MockGenerator() }
+            single<D20Repository> { PostgresD20Repository() }
+        }
+        startKoin {
+            modules(repositoryTestModule)
+        }
+        get<DatabaseFactory>().connect()
         transaction {
             SchemaUtils.create(GamesTable)
             SchemaUtils.create(PlayersTable)
             SchemaUtils.create(DMTable)
         }
-        repository = PostgresD20Repository(generateCodes = generateSequentialGameCodes())
+        repository = get()
         testDM = DMForm("jack")
     }
 
@@ -37,6 +51,7 @@ class RepositoryTests {
             SchemaUtils.drop(DMTable)
             SchemaUtils.drop(GamesTable)
         }
+        stopKoin()
     }
 
     @Test
