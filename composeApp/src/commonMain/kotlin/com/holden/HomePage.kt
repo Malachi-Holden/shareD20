@@ -6,13 +6,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import com.holden.dm.CreateGame
 import com.holden.player.JoinGame
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Sample view for the app main page
  */
 @Composable
 fun GamePage(
-    viewModel: D20ViewModel
+    viewModel: D20ViewModel = koinViewModel()
 ) {
     when (val appState = viewModel.appState) {
         is AppState.Home -> Home(

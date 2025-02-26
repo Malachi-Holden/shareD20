@@ -8,10 +8,8 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ClientRepository(
-    val client: HttpClient
-): D20Repository, KoinComponent {
-//     by inject()
+class ClientRepository: D20Repository, KoinComponent {
+    val client: HttpClient by inject()
 
     override suspend fun addGame(form: GameForm): Game {
         return client.post("/games") {

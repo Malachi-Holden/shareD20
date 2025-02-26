@@ -10,10 +10,8 @@ import kotlinx.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class D20ViewModel(
-    val repository: D20Repository
-): ViewModel(), KoinComponent {
-//     by inject()
+class D20ViewModel: ViewModel(), KoinComponent {
+    val repository: D20Repository by inject()
 
     private val _appState = MutableStateFlow<AppState>(AppState.Home)
     val appState: AppState
