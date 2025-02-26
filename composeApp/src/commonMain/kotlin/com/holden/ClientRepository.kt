@@ -5,8 +5,14 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ClientRepository(val client: HttpClient): D20Repository {
+class ClientRepository(
+    val client: HttpClient
+): D20Repository, KoinComponent {
+//     by inject()
+
     override suspend fun addGame(form: GameForm): Game {
         return client.post("/games") {
             contentType(ContentType.Application.Json)

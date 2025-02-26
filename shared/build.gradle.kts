@@ -40,6 +40,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
+//            implementation("io.insert-koin:koin-core:3.2.0")
         }
     }
 }
