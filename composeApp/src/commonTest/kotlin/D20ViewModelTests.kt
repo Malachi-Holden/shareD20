@@ -3,9 +3,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.*
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import org.koin.test.KoinTest
 import kotlin.test.*
+import org.koin.test.get
 
-class D20ViewModelTests {
+class D20ViewModelTests : KoinTest {
     lateinit var repository: D20Repository
     lateinit var viewModel: D20ViewModel
     val testDispatcher = StandardTestDispatcher()
@@ -13,8 +20,15 @@ class D20ViewModelTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
-        repository = MockD20Repository(30)
-        viewModel = D20ViewModel(repository)
+        val composeTestModule = module {
+            single <D20Repository> { MockD20Repository(30) }
+            viewModelOf<D20ViewModel>(constructor = { D20ViewModel() })
+        }
+        startKoin {
+            modules(composeTestModule)
+        }
+        repository = get()
+        viewModel = get()
         Dispatchers.setMain(testDispatcher)
     }
 
@@ -23,6 +37,7 @@ class D20ViewModelTests {
     fun tearDown() {
         Dispatchers.resetMain()
         testDispatcher.cancel()
+        stopKoin()
     }
 
     @Test
