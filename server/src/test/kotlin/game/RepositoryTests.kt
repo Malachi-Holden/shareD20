@@ -17,6 +17,8 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import runTransactionTest
+import setupRepositoryTestSuite
+import tearDownRepositoryTestSuite
 import kotlin.test.*
 
 class RepositoryTests: KoinTest {
@@ -24,35 +26,14 @@ class RepositoryTests: KoinTest {
 
     @BeforeTest
     fun setup() {
-        val repositoryTestModule = org.koin.dsl.module {
-            single<DatabaseFactory> { InMemoryDatabaseFactory }
-            single<GenerateCodes> { MockGenerator() }
-            single<CrdRepository<String, GameForm, Game>> { GamesPostgresRepository() }
-        }
-        startKoin {
-            modules(repositoryTestModule)
-        }
-        get<DatabaseFactory>().connect()
-        transaction {
-            SchemaUtils.create(GamesTable)
-            SchemaUtils.create(PlayersTable)
-            SchemaUtils.create(DMsTable)
-            SchemaUtils.create(DieRollsTable)
-        }
+        setupRepositoryTestSuite { GamesPostgresRepository() }
         gamesRepository = get()
     }
 
     @AfterTest
     fun tearDown() {
-        transaction {
-            SchemaUtils.drop(PlayersTable)
-            SchemaUtils.drop(DMsTable)
-            SchemaUtils.drop(DieRollsTable)
-            SchemaUtils.drop(GamesTable)
-        }
-        stopKoin()
+        tearDownRepositoryTestSuite()
     }
-
 
     @Test
     fun `addgame should create a game with the correct attributes`() = runTransactionTest {
