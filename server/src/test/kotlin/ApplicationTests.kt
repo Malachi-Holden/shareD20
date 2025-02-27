@@ -1,7 +1,5 @@
 import com.holden.D20Repository
-import com.holden.D20RepositoryOld
 import com.holden.MockD20Repository
-import com.holden.MockD20RepositoryOld
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import org.koin.core.component.get
@@ -10,8 +8,8 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import kotlin.test.AfterTest
-import kotlin.test.Test
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ApplicationTests: KoinTest {

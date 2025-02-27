@@ -12,7 +12,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-fun mockHttpClient(serverRepository: D20RepositoryOld) = HttpClient(
+fun mockHttpClient(serverRepository: D20Repository) = HttpClient(
     engine = MockEngine { request ->
         val pathSegments = request.url.segments
         val bodyText = (request.body as? TextContent)?.text
@@ -74,20 +74,20 @@ fun MockRequestHandleScope.noContent() = respond(
 
 private suspend fun MockRequestHandleScope.postGame(
     bodyText: String?,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val form: GameForm = Json.decodeFromString(bodyText ?: return failedToParse()) ?: return failedToParse()
-    val game = serverRepository.addGame(form)
+    val game = serverRepository.gamesRepository.create(form)
     return success(game)
 }
 
 private suspend fun MockRequestHandleScope.getGame(
     pathSegments: List<String>,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val code = pathSegments.getOrNull(1) ?: return failedToParse()
     val game = try {
-        serverRepository.getGameByCode(code)
+        serverRepository.gamesRepository.read(code)
     } catch (e: InvalidGameCode) {
         return notFound("InvalidGameCode")
     }
@@ -96,11 +96,11 @@ private suspend fun MockRequestHandleScope.getGame(
 
 private suspend fun MockRequestHandleScope.deleteGame(
     pathSegments: List<String>,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val code = pathSegments.getOrNull(1) ?: return failedToParse()
     try {
-        serverRepository.deleteGame(code)
+        serverRepository.gamesRepository.delete(code)
     } catch (e: InvalidGameCode) {
         return notFound("InvalidGameCode")
     }
@@ -109,20 +109,20 @@ private suspend fun MockRequestHandleScope.deleteGame(
 
 private suspend fun MockRequestHandleScope.postPlayer(
     bodyText: String?,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val form: PlayerForm = Json.decodeFromString(bodyText ?: return failedToParse()) ?: return failedToParse()
-    val player = serverRepository.createPlayer(form)
+    val player = serverRepository.playersRepository.create(form)
     return success(player)
 }
 
 private suspend fun MockRequestHandleScope.getPlayer(
     pathSegments: List<String>,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val player = try {
-        serverRepository.getPlayer(id)
+        serverRepository.playersRepository.read(id)
     } catch (e: InvalidPlayerId) {
         return notFound("InvalidPlayerId")
     }
@@ -131,11 +131,11 @@ private suspend fun MockRequestHandleScope.getPlayer(
 
 private suspend fun MockRequestHandleScope.deletePlayer(
     pathSegments: List<String>,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     try {
-        serverRepository.deletePlayer(id)
+        serverRepository.playersRepository.delete(id)
     } catch (e: InvalidPlayerId) {
         return notFound("InvalidPlayerId")
     }
@@ -144,11 +144,11 @@ private suspend fun MockRequestHandleScope.deletePlayer(
 
 private suspend fun MockRequestHandleScope.getDM(
     pathSegments: List<String>,
-    serverRepository: D20RepositoryOld
+    serverRepository: D20Repository
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val dm = try {
-        serverRepository.getDM(id)
+        serverRepository.dmsRepository.read(id)
     } catch (e: InvalidDMId) {
         return notFound("InvalidDMId")
     }

@@ -30,5 +30,5 @@ val serverModule = module {
     single<DatabaseFactory>(named(ConnectionType.InMemory)) { InMemoryDatabaseFactory }
     single<DatabaseFactory>(named(ConnectionType.PostGres)) { PostGresDatabseFacotry }
     single <GenerateCodes> { StandardGenerator }
-    single <D20RepositoryOld>{ PostgresD20Repository() }
+    single <D20RepositoryOld>{ PostgresD20RepositoryOld() }
 }

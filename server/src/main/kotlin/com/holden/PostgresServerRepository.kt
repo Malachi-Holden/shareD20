@@ -21,7 +21,7 @@ object StandardGenerator: GenerateCodes {
     override fun next(): String = generator.next()
 }
 
-class PostgresD20Repository: D20RepositoryOld, KoinComponent {
+class PostgresD20RepositoryOld: D20RepositoryOld, KoinComponent {
     private val generateCodes: GenerateCodes by inject()
     override suspend fun addGame(form: GameForm): Game = transaction {
         val code = generateCodes.next()

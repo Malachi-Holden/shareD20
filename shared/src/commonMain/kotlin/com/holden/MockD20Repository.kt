@@ -16,17 +16,22 @@ fun generateSequentialIds(): Sequence<Int> {
     }
 }
 
-class MockD20Repository: D20Repository {
+class MockD20Repository(
+    delayMS: Long = 0
+): D20Repository {
     override val gamesRepository = MockGamesRepository(
+        delayMS = delayMS,
         createDM = ::createDM,
         removePlayersInGame = ::removePlayersInGame,
         removeDMForGame = ::removeDMForGame
     )
     override val playersRepository = MockPlayersRepository(
+        delayMS = delayMS,
         addPlayerToGame = ::addPlayerToGame
     )
-    override val dmsRepository = MockDMsRepository()
+    override val dmsRepository = MockDMsRepository(delayMS = delayMS)
     override val dieRollsRepository = MockDieRollsRepository(
+        delayMS = delayMS,
         addDieRollToGame = ::addDieRollToGame
     )
 

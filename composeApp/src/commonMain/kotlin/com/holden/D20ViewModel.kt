@@ -16,7 +16,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class D20ViewModel: ViewModel(), KoinComponent {
-    val repository: D20RepositoryOld by inject()
+    val repository: D20Repository by inject()
 
     private val _appState = MutableStateFlow<AppState>(AppState.Home)
     val appState: AppState
@@ -28,8 +28,8 @@ class D20ViewModel: ViewModel(), KoinComponent {
     fun onJoin(form: PlayerForm) {
         viewModelScope.launch {
             try {
-                val playerFromServer: Player = repository.createPlayer(form)
-                val game: Game = repository.getGameByCode(form.gameCode)
+                val playerFromServer: Player = repository.playersRepository.create(form)
+                val game: Game = repository.gamesRepository.read(form.gameCode)
                 goToPlayingGame(playerFromServer, game)
             } catch (e: InvalidGameCode) {
                 _appState.value = AppState.ErrorState(e)
@@ -41,7 +41,7 @@ class D20ViewModel: ViewModel(), KoinComponent {
 
     fun onCreateGame(form: GameForm) {
         viewModelScope.launch {
-            val game: Game = repository.addGame(form)
+            val game: Game = repository.gamesRepository.create(form)
             val dm = game.dm
             goToDMingGame(dm, game)
         }

@@ -28,7 +28,7 @@ class RepositoryTests: KoinTest {
         val repositoryTestModule = org.koin.dsl.module {
             single<DatabaseFactory> { InMemoryDatabaseFactory }
             single<GenerateCodes> { MockGenerator() }
-            single<D20RepositoryOld> { PostgresD20Repository() }
+            single<D20RepositoryOld> { PostgresD20RepositoryOld() }
         }
         startKoin {
             modules(repositoryTestModule)
