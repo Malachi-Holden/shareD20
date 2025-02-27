@@ -1,11 +1,8 @@
 import com.holden.*
+import com.holden.dieRolls.DieRollsTable
 import com.holden.dms.DM
 import com.holden.dms.DMForm
-import com.holden.games.GameEntity
-import com.holden.games.GameForm
-import com.holden.games.GamesTable
-import com.holden.games.toModel
-import com.holden.generateSequentialGameCodes
+import com.holden.games.*
 import com.holden.players.*
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -41,6 +38,7 @@ class RepositoryTests: KoinTest {
             SchemaUtils.create(GamesTable)
             SchemaUtils.create(PlayersTable)
             SchemaUtils.create(DMTable)
+            SchemaUtils.create(DieRollsTable)
         }
         repository = get()
         testDM = DMForm("jack")
@@ -51,6 +49,7 @@ class RepositoryTests: KoinTest {
         transaction {
             SchemaUtils.drop(PlayersTable)
             SchemaUtils.drop(DMTable)
+            SchemaUtils.drop(DieRollsTable)
             SchemaUtils.drop(GamesTable)
         }
         stopKoin()

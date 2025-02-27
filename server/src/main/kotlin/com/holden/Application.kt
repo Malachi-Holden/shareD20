@@ -35,12 +35,12 @@ fun main(args: Array<String>) {
 }
 
 fun repositoryModule(
-    repository: D20RepositoryOld,
-    module: Application.(D20RepositoryOld) -> Unit
+    repository: D20Repository,
+    module: Application.(D20Repository) -> Unit
 ): Application.() -> Unit = { module(repository) }
 
 fun Application.module(
-    repository: D20RepositoryOld
+    repository: D20Repository
 ) {
     install(CORS){ // to allow testing on localhost
         allowHost("localhost:8081", schemes = listOf("http", "https"))

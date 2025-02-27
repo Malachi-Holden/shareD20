@@ -11,3 +11,10 @@ interface CrdRepository<I, F, D> {
     suspend fun read(id: I): D
     suspend fun delete(id: I)
 }
+
+suspend fun <I, F, D>CrdRepository<I, F, D>.hasDataWithId(id: I): Boolean = try {
+    read(id)
+    true
+} catch (e: ShareD20IAE) {
+    false
+}

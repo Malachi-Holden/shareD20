@@ -13,7 +13,7 @@ fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().
 
 class MockGamesRepository(
     val delayMS: Long = 0,
-    val createDM: suspend (Pair<DMForm, String>) -> DM, // should update the DM in the DM repo
+    val createDM: suspend (Pair<DMForm, String>) -> DM,
     val removePlayersInGame: suspend (gameCode: String) -> Unit,
     val removeDMForGame: suspend (gameCode: String) -> Unit
 ): CrdRepository<String, GameForm, Game> {

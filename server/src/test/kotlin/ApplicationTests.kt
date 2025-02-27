@@ -1,4 +1,6 @@
+import com.holden.D20Repository
 import com.holden.D20RepositoryOld
+import com.holden.MockD20Repository
 import com.holden.MockD20RepositoryOld
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -13,12 +15,12 @@ import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
 class ApplicationTests: KoinTest {
-    lateinit var repository: D20RepositoryOld
+    lateinit var repository: D20Repository
 
     @BeforeTest
     fun setup() {
         val routesTestModule = module {
-            single<D20RepositoryOld> { MockD20RepositoryOld() }
+            single<D20Repository> { MockD20Repository() }
         }
         startKoin {
             modules(routesTestModule)
