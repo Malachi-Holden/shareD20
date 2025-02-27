@@ -1,4 +1,6 @@
 import com.holden.D20Repository
+import com.holden.GenerateCodes
+import com.holden.game.generateSequentialGameCodes
 import com.holden.module
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -28,4 +30,9 @@ fun runTransactionTest(statement: suspend Transaction.() -> Unit) = transaction 
     runTest {
         statement()
     }
+}
+
+class MockGenerator: GenerateCodes {
+    val generator = generateSequentialGameCodes()
+    override fun next(): String = generator.next()
 }
