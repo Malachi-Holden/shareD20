@@ -4,6 +4,9 @@ import com.holden.NoDMFoundWithGameCode
 import com.holden.dieRolls.DieRollEntity
 import com.holden.dieRolls.DieRollsTable
 import com.holden.dieRolls.toModel
+import com.holden.dms.DMEntity
+import com.holden.dms.DMsTable
+import com.holden.dms.toModel
 import com.holden.players.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
@@ -24,7 +27,7 @@ class GameEntity(code: EntityID<String>): Entity<String>(code) {
     var code by GamesTable.id
     var name by GamesTable.name
     val dm: DMEntity?
-        get() = DMEntity.find(DMTable.gameCode eq code).firstOrNull()
+        get() = DMEntity.find(DMsTable.gameCode eq code).firstOrNull()
     val players by PlayerEntity referrersOn PlayersTable.gameCode
     val dieRolls by DieRollEntity referrersOn DieRollsTable.gameCode
 }

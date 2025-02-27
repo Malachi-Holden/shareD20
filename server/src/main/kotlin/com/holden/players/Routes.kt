@@ -42,13 +42,3 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     }
 }
 
-fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
-    get("/{id}") {
-        val id = call.pathParameters["id"]?.toInt()
-        try {
-            call.respond(repository.dmsRepository.read(id ?: throw InvalidDMId(null)))
-        } catch (e: InvalidDMId) {
-            call.respond(HttpStatusCode.NotFound, "InvalidDMId")
-        }
-    }
-}

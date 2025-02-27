@@ -1,7 +1,6 @@
 import com.holden.*
 import com.holden.dieRolls.DieRollsTable
-import com.holden.dms.DM
-import com.holden.dms.DMForm
+import com.holden.dms.*
 import com.holden.games.*
 import com.holden.players.*
 import kotlinx.coroutines.test.runTest
@@ -19,8 +18,7 @@ class MockGenerator: GenerateCodes {
 }
 
 class RepositoryTests: KoinTest {
-
-    lateinit var repository: D20RepositoryOld
+    lateinit var repository: D20Repository
     lateinit var testDM: DMForm
 
     @BeforeTest
@@ -28,7 +26,7 @@ class RepositoryTests: KoinTest {
         val repositoryTestModule = org.koin.dsl.module {
             single<DatabaseFactory> { InMemoryDatabaseFactory }
             single<GenerateCodes> { MockGenerator() }
-            single<D20RepositoryOld> { PostgresD20RepositoryOld() }
+            single<D20Repository> { PostgresRepository() }
         }
         startKoin {
             modules(repositoryTestModule)
@@ -37,7 +35,7 @@ class RepositoryTests: KoinTest {
         transaction {
             SchemaUtils.create(GamesTable)
             SchemaUtils.create(PlayersTable)
-            SchemaUtils.create(DMTable)
+            SchemaUtils.create(DMsTable)
             SchemaUtils.create(DieRollsTable)
         }
         repository = get()
@@ -48,7 +46,7 @@ class RepositoryTests: KoinTest {
     fun tearDown() {
         transaction {
             SchemaUtils.drop(PlayersTable)
-            SchemaUtils.drop(DMTable)
+            SchemaUtils.drop(DMsTable)
             SchemaUtils.drop(DieRollsTable)
             SchemaUtils.drop(GamesTable)
         }
@@ -58,7 +56,7 @@ class RepositoryTests: KoinTest {
     @Test
     fun `addgame should create a game with the correct attributes`() = runTransactionTest {
         val form = GameForm("Hello world", testDM)
-        val game = repository.addGame(form)
+        val game = repository.gamesRepository.create(form)
         assertEquals(form.name, game.name)
         assertEquals(form.dm.name, game.dm.name)
         val gottenGame = GameEntity.findById(game.code)?.toModel()
@@ -74,17 +72,14 @@ class RepositoryTests: KoinTest {
             name = "Jack"
             game = newGame
         }
-        val gameFromRepo = repository.getGameByCode("00000000")
+        val gameFromRepo = repository.gamesRepository.read("00000000")
         assertEquals(newGame.toModel(), gameFromRepo)
     }
 
     @Test
     fun `getGame should fail if code is bad`() = runTransactionTest {
         assertFailsWith<InvalidGameCode> {
-            repository.getGameByCode("666")
-        }
-        assertFailsWith<InvalidGameCode> {
-            repository.getGameByCode(null)
+            repository.gamesRepository.read("666")
         }
     }
 
@@ -98,18 +93,15 @@ class RepositoryTests: KoinTest {
             game = newGame
         }
 
-        assert(repository.hasGameWithCode("00000000"))
-        repository.deleteGame("00000000")
-        assertFalse(repository.hasGameWithCode("00000000"))
+        assert(repository.gamesRepository.hasDataWithId("00000000"))
+        repository.gamesRepository.delete("00000000")
+        assertFalse(repository.gamesRepository.hasDataWithId("00000000"))
     }
 
     @Test
     fun `deletegame should fail if code is bad`() = runTransactionTest {
         assertFailsWith<InvalidGameCode> {
-            repository.deleteGame("666")
-        }
-        assertFailsWith<InvalidGameCode> {
-            repository.deleteGame(null)
+            repository.gamesRepository.delete("666")
         }
     }
 
@@ -136,7 +128,7 @@ class RepositoryTests: KoinTest {
                 game = newGame
             }.toModel()
         }
-        repository.deleteGame(newGame.code.value)
+        repository.gamesRepository.delete(newGame.code.value)
         transaction {
             assertNull(DMEntity.findById(dm.id))
             assertNull(PlayerEntity.findById(player1.id))
@@ -154,7 +146,7 @@ class RepositoryTests: KoinTest {
             game = newGame
         }
         assertEquals(0, newGame.players.count())
-        val player = repository.createPlayer(PlayerForm("john", newGame.code.value))
+        val player = repository.playersRepository.create(PlayerForm("john", newGame.code.value))
         assertEquals(1, newGame.players.count())
         assertEquals(player, newGame.players.first().toModel())
     }
@@ -172,17 +164,14 @@ class RepositoryTests: KoinTest {
             name = "john"
             game = newGame
         }
-        val playerFromRepo = repository.getPlayer(player.id.value)
+        val playerFromRepo = repository.playersRepository.read(player.id.value)
         assertEquals(player.toModel(), playerFromRepo)
     }
 
     @Test
     fun `getplayer should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidPlayerId> {
-            repository.getPlayer(666)
-        }
-        assertFailsWith<InvalidPlayerId> {
-            repository.getPlayer(null)
+            repository.playersRepository.read(666)
         }
     }
 
@@ -201,7 +190,7 @@ class RepositoryTests: KoinTest {
         }
         val playerId = player.id.value
         assertEquals(newGame.players.first().toModel(), player.toModel())
-        repository.deletePlayer(playerId)
+        repository.playersRepository.delete(playerId)
         assertEquals(0, newGame.players.count())
         assertNull(PlayerEntity.findById(playerId))
     }
@@ -209,10 +198,7 @@ class RepositoryTests: KoinTest {
     @Test
     fun `deletePlayer should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidPlayerId> {
-            repository.deletePlayer(666)
-        }
-        assertFailsWith<InvalidPlayerId> {
-            repository.deletePlayer(null)
+            repository.playersRepository.delete(666)
         }
     }
 
@@ -225,16 +211,13 @@ class RepositoryTests: KoinTest {
             name = "Jack"
             game = newGame
         }
-        assertEquals(dm.toModel(), repository.getDM(dm.id.value))
+        assertEquals(dm.toModel(), repository.dmsRepository.read(dm.id.value))
     }
 
     @Test
     fun `getDM should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidDMId> {
-            repository.getDM(666)
-        }
-        assertFailsWith<InvalidDMId> {
-            repository.getDM(null)
+            repository.dmsRepository.read(666)
         }
     }
 }

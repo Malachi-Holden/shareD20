@@ -4,9 +4,9 @@ import com.holden.di.ConnectionType
 import com.holden.di.initKoin
 import com.holden.games.GamesTable
 import com.holden.games.gamesRoutes
-import com.holden.players.DMTable
+import com.holden.dms.DMsTable
 import com.holden.players.PlayersTable
-import com.holden.players.dmsRoutes
+import com.holden.dms.dmsRoutes
 import com.holden.players.playersRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     koin.get<DatabaseFactory>(named(ConnectionType.getFromArgs(args))).connect()
     transaction {
         SchemaUtils.create(PlayersTable)
-        SchemaUtils.create(DMTable)
+        SchemaUtils.create(DMsTable)
         SchemaUtils.create(GamesTable)
     }
     val module = repositoryModule(koin.get(), Application::module)
