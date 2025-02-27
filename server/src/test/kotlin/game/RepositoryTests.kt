@@ -1,19 +1,21 @@
 package game
 
-import MockGenerator
-import com.holden.*
-import com.holden.dieRolls.DieRollsTable
-import com.holden.dm.*
-import com.holden.game.*
+import com.holden.GamesRepository
+import com.holden.InvalidGameCode
+import com.holden.dm.DM
+import com.holden.dm.DMEntity
+import com.holden.dm.DMForm
+import com.holden.dm.toModel
+import com.holden.game.GameEntity
+import com.holden.game.GameForm
+import com.holden.game.GamesPostgresRepository
+import com.holden.game.toModel
+import com.holden.hasDataWithId
 import com.holden.player.Player
 import com.holden.player.PlayerEntity
-import com.holden.player.PlayersTable
 import com.holden.player.toModel
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import runTransactionTest
@@ -22,7 +24,7 @@ import tearDownRepositoryTestSuite
 import kotlin.test.*
 
 class RepositoryTests: KoinTest {
-    lateinit var gamesRepository: CrdRepository<String, GameForm, Game>
+    lateinit var gamesRepository: GamesRepository
 
     @BeforeTest
     fun setup() {

@@ -1,17 +1,11 @@
 package dm
 
-import MockGenerator
-import com.holden.*
-import com.holden.dieRolls.DieRollsTable
-import com.holden.dm.*
+import com.holden.DMsRepository
+import com.holden.InvalidDMId
+import com.holden.dm.DMEntity
+import com.holden.dm.DMsPostgresRepository
+import com.holden.dm.toModel
 import com.holden.game.GameEntity
-import com.holden.game.GamesTable
-import com.holden.player.PlayersTable
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import runTransactionTest
@@ -20,7 +14,7 @@ import tearDownRepositoryTestSuite
 import kotlin.test.*
 
 class RepositoryTests: KoinTest {
-    lateinit var dmsRepository: CrdRepository<Int, Pair<DMForm, String>, DM>
+    lateinit var dmsRepository: DMsRepository
 
     @BeforeTest
     fun setup() {

@@ -1,8 +1,11 @@
+package game
+
 import com.holden.*
-import com.holden.game.GameForm
 import com.holden.dm.DMForm
+import com.holden.game.GameForm
 import io.ktor.client.*
 import kotlinx.coroutines.test.runTest
+import mockHttpClient
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.dsl.viewModelOf
@@ -12,7 +15,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.*
 
-class ClientRepositoryTests: KoinTest {
+class RepositoryTests: KoinTest {
     lateinit var serverRepository: D20Repository
     lateinit var clientRepository: D20Repository
 
@@ -35,6 +38,7 @@ class ClientRepositoryTests: KoinTest {
     fun tearDown() {
         stopKoin()
     }
+
 
     @Test
     fun `addGame should correctly add a game to the database`() = runTest {

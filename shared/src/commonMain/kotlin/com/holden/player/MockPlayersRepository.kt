@@ -1,7 +1,7 @@
 package com.holden.player
 
-import com.holden.CrdRepository
 import com.holden.InvalidPlayerId
+import com.holden.PlayersRepository
 import com.holden.game.Game
 import com.holden.generateSequentialIds
 import com.holden.util.removeAll
@@ -10,7 +10,7 @@ import kotlinx.coroutines.delay
 class MockPlayersRepository(
     val delayMS: Long = 0,
     val addPlayerToGame: (player: Player, gameCode: String) -> Unit
-): CrdRepository<Int, PlayerForm, Player> {
+): PlayersRepository {
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
     val games: MutableMap<String, Game> = mutableMapOf() // remove
     val players: MutableMap<Int, Player> = mutableMapOf()

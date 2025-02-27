@@ -1,10 +1,10 @@
 package com.holden.dieRolls
 
-import com.holden.CrdRepository
+import com.holden.DieRollsRepository
 import com.holden.dieRoll.DieRoll
 import com.holden.dieRoll.DieRollForm
 
-class DieRollsPostgresRepository: CrdRepository<Int, DieRollForm, DieRoll> {
+class DieRollsPostgresRepository: DieRollsRepository {
     override suspend fun create(form: DieRollForm): DieRoll {
         TODO("Not yet implemented")
     }

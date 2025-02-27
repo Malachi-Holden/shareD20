@@ -1,6 +1,6 @@
 package com.holden.dm
 
-import com.holden.CrdRepository
+import com.holden.DMsRepository
 import com.holden.getHttpError
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -9,7 +9,7 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class DMsClientRepository: CrdRepository<Int, Pair<DMForm, String>, DM>, KoinComponent {
+class DMsClientRepository: DMsRepository, KoinComponent {
     val client: HttpClient by inject()
 
     override suspend fun create(form: Pair<DMForm, String>): DM {

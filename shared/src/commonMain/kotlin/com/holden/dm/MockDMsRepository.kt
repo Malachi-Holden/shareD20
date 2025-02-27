@@ -1,6 +1,6 @@
 package com.holden.dm
 
-import com.holden.CrdRepository
+import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import com.holden.generateSequentialIds
 import com.holden.util.removeAll
@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 
 class MockDMsRepository(
     val delayMS: Long = 0
-): CrdRepository<Int, Pair<DMForm, String>, DM> {
+): DMsRepository {
 
     val dms: MutableMap<Int, DM> = mutableMapOf()
     private val generateDMIds: Iterator<Int> = generateSequentialIds().iterator()

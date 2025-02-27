@@ -21,7 +21,7 @@ import tearDownRepositoryTestSuite
 import kotlin.test.*
 
 class RepositoryTests: KoinTest {
-    lateinit var playersRepository: CrdRepository<Int, PlayerForm, Player>
+    lateinit var playersRepository: PlayersRepository
 
     @BeforeTest
     fun setup() {

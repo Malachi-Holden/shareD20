@@ -1,6 +1,6 @@
 package com.holden.game
 
-import com.holden.CrdRepository
+import com.holden.GamesRepository
 import com.holden.InvalidGameCode
 import com.holden.dieRoll.DieRoll
 import com.holden.dm.DM
@@ -16,7 +16,7 @@ class MockGamesRepository(
     val createDM: suspend (Pair<DMForm, String>) -> DM,
     val removePlayersInGame: suspend (gameCode: String) -> Unit,
     val removeDMForGame: suspend (gameCode: String) -> Unit
-): CrdRepository<String, GameForm, Game> {
+): GamesRepository {
     val games: MutableMap<String, Game> = mutableMapOf()
     private val generateCodes: Iterator<String> = generateSequentialGameCodes()
 

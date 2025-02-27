@@ -1,6 +1,6 @@
 package com.holden.dieRoll
 
-import com.holden.CrdRepository
+import com.holden.DieRollsRepository
 import com.holden.InvalidDieRollId
 import com.holden.generateSequentialIds
 import kotlinx.coroutines.delay
@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 class MockDieRollsRepository(
     val delayMS: Long = 0,
     val addDieRollToGame: (dieRoll: DieRoll, gameCode: String) -> Unit
-): CrdRepository<Int, DieRollForm, DieRoll> {
+): DieRollsRepository {
     private val generateDieRollIds: Iterator<Int> = generateSequentialIds().iterator()
     val dieRolls: MutableMap<Int, DieRoll> = mutableMapOf()
 

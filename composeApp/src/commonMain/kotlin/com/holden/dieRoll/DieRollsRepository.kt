@@ -1,11 +1,11 @@
 package com.holden.dieRoll
 
-import com.holden.CrdRepository
+import com.holden.DieRollsRepository
 import io.ktor.client.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class DieRollsRepository: CrdRepository<Int, DieRollForm, DieRoll>, KoinComponent {
+class DieRollsRepository: DieRollsRepository, KoinComponent {
     val client: HttpClient by inject()
 
     override suspend fun create(form: DieRollForm): DieRoll {

@@ -1,6 +1,6 @@
 package com.holden.game
 
-import com.holden.CrdRepository
+import com.holden.GamesRepository
 import com.holden.getHttpError
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -9,7 +9,7 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class GamesClientRepository: CrdRepository<String, GameForm, Game>, KoinComponent {
+class GamesClientRepository: GamesRepository, KoinComponent {
     val client: HttpClient by inject()
 
     override suspend fun create(form: GameForm): Game = client.post("/games") {
