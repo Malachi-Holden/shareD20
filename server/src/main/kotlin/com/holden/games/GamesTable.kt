@@ -1,7 +1,9 @@
 package com.holden.games
 
-import com.holden.Game
 import com.holden.NoDMFoundWithGameCode
+import com.holden.dieRolls.DieRollEntity
+import com.holden.dieRolls.DieRollsTable
+import com.holden.dieRolls.toModel
 import com.holden.players.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
@@ -24,6 +26,7 @@ class GameEntity(code: EntityID<String>): Entity<String>(code) {
     val dm: DMEntity?
         get() = DMEntity.find(DMTable.gameCode eq code).firstOrNull()
     val players by PlayerEntity referrersOn PlayersTable.gameCode
+    val dieRolls by DieRollEntity referrersOn DieRollsTable.gameCode
 }
 
 fun GameEntity.toModel() = Game(
@@ -31,6 +34,10 @@ fun GameEntity.toModel() = Game(
     name = name,
     dm = dm?.toModel() ?: throw NoDMFoundWithGameCode(code.value),
     players = players
+        .map {
+            it.toModel()
+        },
+    dieRolls = dieRolls
         .map {
             it.toModel()
         }

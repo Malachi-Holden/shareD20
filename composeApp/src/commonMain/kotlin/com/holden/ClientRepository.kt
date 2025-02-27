@@ -1,5 +1,10 @@
 package com.holden
 
+import com.holden.games.Game
+import com.holden.games.GameForm
+import com.holden.dms.DM
+import com.holden.players.Player
+import com.holden.players.PlayerForm
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -8,7 +13,7 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ClientRepository: D20Repository, KoinComponent {
+class ClientRepository: D20RepositoryOld, KoinComponent {
     val client: HttpClient by inject()
 
     override suspend fun addGame(form: GameForm): Game {

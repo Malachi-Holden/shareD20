@@ -1,7 +1,6 @@
 package com.holden.players
 
-import com.holden.DM
-import com.holden.Player
+import com.holden.dms.DM
 import com.holden.games.GameEntity
 import com.holden.games.GamesTable
 import org.jetbrains.exposed.dao.IntEntity

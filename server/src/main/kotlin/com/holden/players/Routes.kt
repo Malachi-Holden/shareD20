@@ -7,7 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Routing.playersRoutes(repository: D20Repository) = route("players") {
+fun Routing.playersRoutes(repository: D20RepositoryOld) = route("players") {
     post {
         try {
             val form = call.receive<PlayerForm>()
@@ -42,7 +42,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     }
 }
 
-fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
+fun Routing.dmsRoutes(repository: D20RepositoryOld) = route("dms") {
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {

@@ -1,4 +1,6 @@
 import com.holden.*
+import com.holden.games.GameForm
+import com.holden.dms.DMForm
 import kotlinx.coroutines.test.runTest
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -10,15 +12,15 @@ import org.koin.test.get
 import kotlin.test.*
 
 class ClientRepositoryTests: KoinTest {
-    lateinit var serverRepository: D20Repository
-    lateinit var clientRepository: D20Repository
+    lateinit var serverRepository: D20RepositoryOld
+    lateinit var clientRepository: D20RepositoryOld
 
     @BeforeTest
     fun setup() {
         val composeTestModule = module {
-            single <D20Repository> (named("server")){ MockD20Repository() }
+            single <D20RepositoryOld> (named("server")){ MockD20RepositoryOld() }
             single { mockHttpClient(get(named("server"))) }
-            single <D20Repository> (named("client")){ ClientRepository() }
+            single <D20RepositoryOld> (named("client")){ ClientRepository() }
             viewModelOf<D20ViewModel>(constructor = { D20ViewModel() })
         }
         startKoin {

@@ -1,15 +1,15 @@
 package com.holden
 
+import com.holden.dms.DM
+import com.holden.games.Game
 import com.holden.games.GameEntity
+import com.holden.games.GameForm
 import com.holden.games.toModel
-import com.holden.players.DMEntity
-import com.holden.players.PlayerEntity
-import com.holden.players.toModel
+import com.holden.players.*
 import com.holden.util.uniqueRandomStringIterator
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 val GAME_ID_LENGTH = 8 // in the future this could be set by the administrator
 
@@ -21,7 +21,7 @@ object StandardGenerator: GenerateCodes {
     override fun next(): String = generator.next()
 }
 
-class PostgresD20Repository: D20Repository, KoinComponent {
+class PostgresD20Repository: D20RepositoryOld, KoinComponent {
     private val generateCodes: GenerateCodes by inject()
     override suspend fun addGame(form: GameForm): Game = transaction {
         val code = generateCodes.next()

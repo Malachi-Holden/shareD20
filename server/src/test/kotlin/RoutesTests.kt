@@ -1,4 +1,10 @@
 import com.holden.*
+import com.holden.games.Game
+import com.holden.games.GameForm
+import com.holden.dms.DM
+import com.holden.dms.DMForm
+import com.holden.players.Player
+import com.holden.players.PlayerForm
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -11,13 +17,13 @@ import org.koin.test.get
 import kotlin.test.*
 
 class RoutesTests: KoinTest {
-    lateinit var repository: D20Repository
+    lateinit var repository: D20RepositoryOld
     lateinit var testDM: DMForm
 
     @BeforeTest
     fun setup() {
         val routesTestModule = module {
-            single<D20Repository> { MockD20Repository() }
+            single<D20RepositoryOld> { MockD20RepositoryOld() }
         }
         startKoin {
             modules(routesTestModule)

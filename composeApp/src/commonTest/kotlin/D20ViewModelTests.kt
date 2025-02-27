@@ -1,4 +1,7 @@
 import com.holden.*
+import com.holden.games.GameForm
+import com.holden.dms.DMForm
+import com.holden.players.PlayerForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -6,14 +9,13 @@ import kotlinx.coroutines.test.*
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import kotlin.test.*
 import org.koin.test.get
 
 class D20ViewModelTests : KoinTest {
-    lateinit var repository: D20Repository
+    lateinit var repository: D20RepositoryOld
     lateinit var viewModel: D20ViewModel
     val testDispatcher = StandardTestDispatcher()
 
@@ -21,7 +23,7 @@ class D20ViewModelTests : KoinTest {
     @BeforeTest
     fun setup() {
         val composeTestModule = module {
-            single <D20Repository> { MockD20Repository(30) }
+            single <D20RepositoryOld> { MockD20RepositoryOld(30) }
             viewModelOf<D20ViewModel>(constructor = { D20ViewModel() })
         }
         startKoin {

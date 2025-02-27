@@ -1,11 +1,13 @@
 import com.holden.*
+import com.holden.dms.DM
+import com.holden.dms.DMForm
 import com.holden.games.GameEntity
+import com.holden.games.GameForm
 import com.holden.games.GamesTable
 import com.holden.games.toModel
 import com.holden.generateSequentialGameCodes
 import com.holden.players.*
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.startKoin
@@ -21,7 +23,7 @@ class MockGenerator: GenerateCodes {
 
 class RepositoryTests: KoinTest {
 
-    lateinit var repository: D20Repository
+    lateinit var repository: D20RepositoryOld
     lateinit var testDM: DMForm
 
     @BeforeTest
@@ -29,7 +31,7 @@ class RepositoryTests: KoinTest {
         val repositoryTestModule = org.koin.dsl.module {
             single<DatabaseFactory> { InMemoryDatabaseFactory }
             single<GenerateCodes> { MockGenerator() }
-            single<D20Repository> { PostgresD20Repository() }
+            single<D20RepositoryOld> { PostgresD20Repository() }
         }
         startKoin {
             modules(repositoryTestModule)

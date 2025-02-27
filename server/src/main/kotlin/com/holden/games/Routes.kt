@@ -1,7 +1,6 @@
 package com.holden.games
 
-import com.holden.D20Repository
-import com.holden.GameForm
+import com.holden.D20RepositoryOld
 import com.holden.InvalidGameCode
 import io.ktor.http.*
 import io.ktor.serialization.*
@@ -9,7 +8,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Routing.gamesRoutes(repository: D20Repository) = route("/games") {
+fun Routing.gamesRoutes(repository: D20RepositoryOld) = route("/games") {
     post {
         try {
             val form = call.receive<GameForm>()

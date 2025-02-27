@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.holden.games.Game
+import com.holden.games.GameForm
+import com.holden.dms.DM
+import com.holden.players.Player
+import com.holden.players.PlayerForm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
@@ -11,7 +16,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class D20ViewModel: ViewModel(), KoinComponent {
-    val repository: D20Repository by inject()
+    val repository: D20RepositoryOld by inject()
 
     private val _appState = MutableStateFlow<AppState>(AppState.Home)
     val appState: AppState

@@ -1,4 +1,6 @@
 import com.holden.*
+import com.holden.games.GameForm
+import com.holden.players.PlayerForm
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -8,10 +10,9 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.test.fail
 
 
-fun mockHttpClient(serverRepository: D20Repository) = HttpClient(
+fun mockHttpClient(serverRepository: D20RepositoryOld) = HttpClient(
     engine = MockEngine { request ->
         val pathSegments = request.url.segments
         val bodyText = (request.body as? TextContent)?.text
@@ -73,7 +74,7 @@ fun MockRequestHandleScope.noContent() = respond(
 
 private suspend fun MockRequestHandleScope.postGame(
     bodyText: String?,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val form: GameForm = Json.decodeFromString(bodyText ?: return failedToParse()) ?: return failedToParse()
     val game = serverRepository.addGame(form)
@@ -82,7 +83,7 @@ private suspend fun MockRequestHandleScope.postGame(
 
 private suspend fun MockRequestHandleScope.getGame(
     pathSegments: List<String>,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val code = pathSegments.getOrNull(1) ?: return failedToParse()
     val game = try {
@@ -95,7 +96,7 @@ private suspend fun MockRequestHandleScope.getGame(
 
 private suspend fun MockRequestHandleScope.deleteGame(
     pathSegments: List<String>,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val code = pathSegments.getOrNull(1) ?: return failedToParse()
     try {
@@ -108,7 +109,7 @@ private suspend fun MockRequestHandleScope.deleteGame(
 
 private suspend fun MockRequestHandleScope.postPlayer(
     bodyText: String?,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val form: PlayerForm = Json.decodeFromString(bodyText ?: return failedToParse()) ?: return failedToParse()
     val player = serverRepository.createPlayer(form)
@@ -117,7 +118,7 @@ private suspend fun MockRequestHandleScope.postPlayer(
 
 private suspend fun MockRequestHandleScope.getPlayer(
     pathSegments: List<String>,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val player = try {
@@ -130,7 +131,7 @@ private suspend fun MockRequestHandleScope.getPlayer(
 
 private suspend fun MockRequestHandleScope.deletePlayer(
     pathSegments: List<String>,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     try {
@@ -143,7 +144,7 @@ private suspend fun MockRequestHandleScope.deletePlayer(
 
 private suspend fun MockRequestHandleScope.getDM(
     pathSegments: List<String>,
-    serverRepository: D20Repository
+    serverRepository: D20RepositoryOld
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val dm = try {
