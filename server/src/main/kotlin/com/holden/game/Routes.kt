@@ -1,4 +1,4 @@
-package com.holden.games
+package com.holden.game
 
 import com.holden.D20Repository
 import com.holden.InvalidGameCode

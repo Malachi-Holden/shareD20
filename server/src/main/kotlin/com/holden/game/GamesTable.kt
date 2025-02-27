@@ -1,13 +1,13 @@
-package com.holden.games
+package com.holden.game
 
 import com.holden.NoDMFoundWithGameCode
 import com.holden.dieRolls.DieRollEntity
 import com.holden.dieRolls.DieRollsTable
 import com.holden.dieRolls.toModel
-import com.holden.dms.DMEntity
-import com.holden.dms.DMsTable
-import com.holden.dms.toModel
-import com.holden.players.*
+import com.holden.dm.DMEntity
+import com.holden.dm.DMsTable
+import com.holden.dm.toModel
+import com.holden.player.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID

@@ -1,9 +1,9 @@
-package com.holden.players
+package com.holden.player
 
 import com.holden.CrdRepository
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
-import com.holden.games.GameEntity
+import com.holden.game.GameEntity
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class PlayersPostgresRepository: CrdRepository<Int, PlayerForm, Player> {

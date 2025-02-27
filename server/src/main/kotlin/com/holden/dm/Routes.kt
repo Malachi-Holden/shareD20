@@ -1,4 +1,4 @@
-package com.holden.dms
+package com.holden.dm
 
 import com.holden.D20Repository
 import com.holden.InvalidDMId

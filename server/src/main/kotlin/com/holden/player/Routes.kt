@@ -1,4 +1,4 @@
-package com.holden.players
+package com.holden.player
 
 import com.holden.*
 import io.ktor.http.*

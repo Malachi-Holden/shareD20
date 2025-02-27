@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.holden.games.Game
-import com.holden.games.GameForm
-import com.holden.dms.DM
-import com.holden.players.Player
-import com.holden.players.PlayerForm
+import com.holden.game.Game
+import com.holden.game.GameForm
+import com.holden.dm.DM
+import com.holden.player.Player
+import com.holden.player.PlayerForm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException

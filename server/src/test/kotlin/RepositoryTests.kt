@@ -1,8 +1,8 @@
 import com.holden.*
 import com.holden.dieRolls.DieRollsTable
-import com.holden.dms.*
-import com.holden.games.*
-import com.holden.players.*
+import com.holden.dm.*
+import com.holden.game.*
+import com.holden.player.*
 import kotlinx.coroutines.test.runTest
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction

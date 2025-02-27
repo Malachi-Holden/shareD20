@@ -1,6 +1,6 @@
 import com.holden.*
-import com.holden.games.GameForm
-import com.holden.players.PlayerForm
+import com.holden.game.GameForm
+import com.holden.player.PlayerForm
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.contentnegotiation.*

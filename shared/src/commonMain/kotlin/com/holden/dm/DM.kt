@@ -1,4 +1,4 @@
-package com.holden.dms
+package com.holden.dm
 
 import kotlinx.serialization.Serializable
 

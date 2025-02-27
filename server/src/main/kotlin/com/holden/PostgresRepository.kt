@@ -1,14 +1,10 @@
 package com.holden
 
 import com.holden.dieRolls.DieRollsPostgresRepository
-import com.holden.dms.DM
-import com.holden.dms.DMForm
-import com.holden.dms.DMsPostgresRepository
-import com.holden.games.GameEntity
-import com.holden.games.GamesPostgresRepository
-import com.holden.players.Player
-import com.holden.players.PlayerForm
-import com.holden.players.PlayersPostgresRepository
+import com.holden.dm.DMsPostgresRepository
+import com.holden.game.GameEntity
+import com.holden.game.GamesPostgresRepository
+import com.holden.player.PlayersPostgresRepository
 import com.holden.util.uniqueRandomStringIterator
 import org.koin.core.component.KoinComponent
 

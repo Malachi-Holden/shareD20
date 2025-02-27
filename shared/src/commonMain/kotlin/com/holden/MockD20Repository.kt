@@ -2,12 +2,12 @@ package com.holden
 
 import com.holden.dieRoll.DieRoll
 import com.holden.dieRoll.MockDieRollsRepository
-import com.holden.dms.DM
-import com.holden.dms.DMForm
-import com.holden.dms.MockDMsRepository
-import com.holden.games.MockGamesRepository
-import com.holden.players.MockPlayersRepository
-import com.holden.players.Player
+import com.holden.dm.DM
+import com.holden.dm.DMForm
+import com.holden.dm.MockDMsRepository
+import com.holden.game.MockGamesRepository
+import com.holden.player.MockPlayersRepository
+import com.holden.player.Player
 
 fun generateSequentialIds(): Sequence<Int> {
     var current = 0

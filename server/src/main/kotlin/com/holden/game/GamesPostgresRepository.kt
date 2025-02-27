@@ -1,9 +1,9 @@
-package com.holden.games
+package com.holden.game
 
 import com.holden.CrdRepository
 import com.holden.GenerateCodes
 import com.holden.InvalidGameCode
-import com.holden.dms.DMEntity
+import com.holden.dm.DMEntity
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

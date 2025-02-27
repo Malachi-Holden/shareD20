@@ -1,10 +1,10 @@
 import com.holden.*
-import com.holden.games.Game
-import com.holden.games.GameForm
-import com.holden.dms.DM
-import com.holden.dms.DMForm
-import com.holden.players.Player
-import com.holden.players.PlayerForm
+import com.holden.game.Game
+import com.holden.game.GameForm
+import com.holden.dm.DM
+import com.holden.dm.DMForm
+import com.holden.player.Player
+import com.holden.player.PlayerForm
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

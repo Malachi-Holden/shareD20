@@ -1,12 +1,12 @@
-package com.holden.games
+package com.holden.game
 
 import com.holden.CrdRepository
 import com.holden.InvalidGameCode
 import com.holden.dieRoll.DieRoll
-import com.holden.dms.DM
-import com.holden.dms.DMForm
+import com.holden.dm.DM
+import com.holden.dm.DMForm
 import com.holden.generateSequentialIds
-import com.holden.players.Player
+import com.holden.player.Player
 import kotlinx.coroutines.delay
 
 fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().padStart(8, '0') }.iterator()

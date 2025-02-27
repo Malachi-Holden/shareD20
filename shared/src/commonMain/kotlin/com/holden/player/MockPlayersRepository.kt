@@ -1,9 +1,8 @@
-package com.holden.players
+package com.holden.player
 
 import com.holden.CrdRepository
-import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
-import com.holden.games.Game
+import com.holden.game.Game
 import com.holden.generateSequentialIds
 import com.holden.util.removeAll
 import kotlinx.coroutines.delay

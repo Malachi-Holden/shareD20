@@ -2,12 +2,12 @@ package com.holden
 
 import com.holden.di.ConnectionType
 import com.holden.di.initKoin
-import com.holden.games.GamesTable
-import com.holden.games.gamesRoutes
-import com.holden.dms.DMsTable
-import com.holden.players.PlayersTable
-import com.holden.dms.dmsRoutes
-import com.holden.players.playersRoutes
+import com.holden.game.GamesTable
+import com.holden.game.gamesRoutes
+import com.holden.dm.DMsTable
+import com.holden.player.PlayersTable
+import com.holden.dm.dmsRoutes
+import com.holden.player.playersRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

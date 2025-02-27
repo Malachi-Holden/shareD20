@@ -7,8 +7,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.holden.dms.DMForm
-import com.holden.games.GameForm
+import com.holden.game.GameForm
 
 @Composable
 fun CreateGame(onCreateGame: (GameForm) -> Unit) {

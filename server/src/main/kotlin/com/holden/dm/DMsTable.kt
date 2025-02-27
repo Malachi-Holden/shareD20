@@ -1,7 +1,7 @@
-package com.holden.dms
+package com.holden.dm
 
-import com.holden.games.GameEntity
-import com.holden.games.GamesTable
+import com.holden.game.GameEntity
+import com.holden.game.GamesTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

@@ -1,9 +1,9 @@
 package com.holden.dieRolls
 
 import com.holden.dieRoll.DieRoll
-import com.holden.games.GameEntity
-import com.holden.games.GamesTable
-import com.holden.players.PlayersTable
+import com.holden.game.GameEntity
+import com.holden.game.GamesTable
+import com.holden.player.PlayersTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

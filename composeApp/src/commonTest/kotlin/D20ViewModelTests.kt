@@ -1,7 +1,7 @@
 import com.holden.*
-import com.holden.games.GameForm
-import com.holden.dms.DMForm
-import com.holden.players.PlayerForm
+import com.holden.game.GameForm
+import com.holden.dm.DMForm
+import com.holden.player.PlayerForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel

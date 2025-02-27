@@ -1,9 +1,9 @@
-package com.holden.dms
+package com.holden.dm
 
 import com.holden.CrdRepository
 import com.holden.InvalidDMId
 import com.holden.InvalidGameCode
-import com.holden.games.GameEntity
+import com.holden.game.GameEntity
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DMsPostgresRepository: CrdRepository<Int, Pair<DMForm, String>, DM> {
