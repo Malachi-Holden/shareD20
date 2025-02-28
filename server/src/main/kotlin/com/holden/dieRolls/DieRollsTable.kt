@@ -25,7 +25,7 @@ object DieRollsTable: IntIdTable() {
 class DieRollEntity(id: EntityID<Int>): IntEntity(id) {
     companion object : IntEntityClass<DieRollEntity>(DieRollsTable)
     var value by DieRollsTable.value
-    var game by GameEntity referencedOn PlayersTable.gameCode
+    var game by GameEntity referencedOn DieRollsTable.gameCode
     var visibility by DieRollsTable.visibility
 }
 
