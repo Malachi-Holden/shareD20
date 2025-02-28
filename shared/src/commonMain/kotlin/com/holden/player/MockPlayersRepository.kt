@@ -9,10 +9,10 @@ import kotlinx.coroutines.delay
 
 class MockPlayersRepository(
     val delayMS: Long = 0,
-    val addPlayerToGame: (player: Player, gameCode: String) -> Unit
+    val addPlayerToGame: (player: Player, gameCode: String) -> Unit,
+    val removePlayerFromGame: (id: Int, gameCode: String) -> Unit
 ): PlayersRepository {
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
-    val games: MutableMap<String, Game> = mutableMapOf() // remove
     val players: MutableMap<Int, Player> = mutableMapOf()
 
     override suspend fun create(form: PlayerForm): Player {
@@ -31,7 +31,9 @@ class MockPlayersRepository(
 
     override suspend fun delete(id: Int) {
         delay(delayMS)
+        val code = players[id]?.gameCode ?: throw InvalidPlayerId(id)
         players.remove(id) ?: throw InvalidPlayerId(id)
+        removePlayerFromGame(id, code)
     }
 
     fun deletePlayersInGame(gameCode: String) {

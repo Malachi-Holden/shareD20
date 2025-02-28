@@ -1,47 +1,36 @@
 package game
 
-import com.holden.*
+import com.holden.D20Repository
+import com.holden.InvalidGameCode
 import com.holden.dm.DMForm
 import com.holden.game.GameForm
-import io.ktor.client.*
+import com.holden.hasDataWithId
 import kotlinx.coroutines.test.runTest
-import mockHttpClient
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
+import util.setupRepositoryTestSuite
+import util.tearDownRepositoryTestSuite
 import kotlin.test.*
 
-class RepositoryTests: KoinTest {
+class ClientRepositoryTests: KoinTest {
     lateinit var serverRepository: D20Repository
     lateinit var clientRepository: D20Repository
 
     @BeforeTest
     fun setup() {
-        val composeTestModule = module {
-            single <D20Repository> (named("server")){ MockD20Repository() }
-            single <HttpClient> { mockHttpClient(get(named("server"))) }
-            single <D20Repository> (named("client")){ ClientRepository() }
-            viewModelOf<D20ViewModel>(constructor = { D20ViewModel() })
-        }
-        startKoin {
-            modules(composeTestModule)
-        }
+        setupRepositoryTestSuite()
         serverRepository = get(named("server"))
         clientRepository = get(named("client"))
     }
 
     @AfterTest
     fun tearDown() {
-        stopKoin()
+        tearDownRepositoryTestSuite()
     }
 
-
     @Test
-    fun `addGame should correctly add a game to the database`() = runTest {
+    fun `create Game should correctly add a game to the database`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val gameFromServer = clientRepository.gamesRepository.create(form)
         val game = serverRepository.gamesRepository.read(gameFromServer.code)
@@ -49,22 +38,22 @@ class RepositoryTests: KoinTest {
     }
 
     @Test
-    fun `getgame should get an existing game`() = runTest {
+    fun `read game should get an existing game`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
-        val game = serverRepository.gamesRepository.create(form)
-        val gameFromServer = clientRepository.gamesRepository.read(game.code)
-        assertEquals(game, gameFromServer)
+        val gameFromServer = serverRepository.gamesRepository.create(form)
+        val game = clientRepository.gamesRepository.read(gameFromServer.code)
+        assertEquals(gameFromServer, game)
     }
 
     @Test
-    fun `getgame should fail if game does not exist`() = runTest {
+    fun `read game should fail if game does not exist`() = runTest {
         assertFailsWith<InvalidGameCode> {
             clientRepository.gamesRepository.read("99")
         }
     }
 
     @Test
-    fun `deleteGame should successfully delete game`() = runTest {
+    fun `delete Game should successfully delete game`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val game = serverRepository.gamesRepository.create(form)
         clientRepository.gamesRepository.delete(game.code)
@@ -72,7 +61,7 @@ class RepositoryTests: KoinTest {
     }
 
     @Test
-    fun `deletegame shuld fail if game does not exist`() = runTest {
+    fun `delete game should fail if game does not exist`() = runTest {
         assertFailsWith<InvalidGameCode> {
             clientRepository.gamesRepository.delete("99")
         }

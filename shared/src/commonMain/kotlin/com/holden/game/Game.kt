@@ -11,8 +11,7 @@ data class Game(
     val code: String,
     val name: String,
     val dm: DM,
-    val players: List<Player>,
-    val dieRolls: List<DieRoll>
+    val players: List<Player>
 )
 
 @Serializable

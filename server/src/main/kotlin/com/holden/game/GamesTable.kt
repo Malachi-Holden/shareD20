@@ -40,8 +40,4 @@ fun GameEntity.toModel() = Game(
         .map {
             it.toModel()
         },
-    dieRolls = dieRolls
-        .map {
-            it.toModel()
-        }
 )

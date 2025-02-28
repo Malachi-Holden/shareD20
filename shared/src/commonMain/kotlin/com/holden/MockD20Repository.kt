@@ -27,12 +27,12 @@ class MockD20Repository(
     )
     override val playersRepository = MockPlayersRepository(
         delayMS = delayMS,
-        addPlayerToGame = ::addPlayerToGame
+        addPlayerToGame = ::addPlayerToGame,
+        removePlayerFromGame = ::removePlayerFromGame
     )
     override val dmsRepository = MockDMsRepository(delayMS = delayMS)
     override val dieRollsRepository = MockDieRollsRepository(
-        delayMS = delayMS,
-        addDieRollToGame = ::addDieRollToGame
+        delayMS = delayMS
     )
 
     suspend fun createDM(form: Pair<DMForm, String>): DM {
@@ -43,15 +43,15 @@ class MockD20Repository(
         playersRepository.deletePlayersInGame(gameCode)
     }
 
+    fun removePlayerFromGame(playerId: Int, gameCode: String) {
+        gamesRepository.removePlayerFromGame(playerId, gameCode)
+    }
+
     fun removeDMForGame(gameCode: String) {
         dmsRepository.removeDMForGame(gameCode)
     }
 
     fun addPlayerToGame(player: Player, gameCode: String) {
         gamesRepository.addPlayerToGame(player, gameCode)
-    }
-
-    fun addDieRollToGame(dieRoll: DieRoll, gameCode: String) {
-        gamesRepository.addDieRollToGame(dieRoll, gameCode)
     }
 }

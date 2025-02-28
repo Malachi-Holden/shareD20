@@ -24,7 +24,7 @@ class MockGamesRepository(
         delay(delayMS)
         val code = generateCodes.next()
         val dm = createDM(form.dm to code)
-        val newGame = Game(code, form.name, dm, listOf(), listOf())
+        val newGame = Game(code, form.name, dm, listOf())
         games[code] = newGame
         return newGame
     }
@@ -48,10 +48,10 @@ class MockGamesRepository(
         )
     }
 
-    fun addDieRollToGame(dieRoll: DieRoll, gameCode: String) {
+    fun removePlayerFromGame(playerId: Int, gameCode: String) {
         val game = games[gameCode] ?: throw InvalidGameCode(gameCode)
         games[gameCode] = game.copy(
-            dieRolls = game.dieRolls + dieRoll
+            players = game.players.filterNot { it.id == playerId }
         )
     }
 }
