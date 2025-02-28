@@ -4,6 +4,7 @@ import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import com.holden.InvalidGameCode
 import com.holden.game.GameEntity
+import com.holden.player.PlayerEntity
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class DMsPostgresRepository: DMsRepository {
@@ -11,9 +12,14 @@ class DMsPostgresRepository: DMsRepository {
         // this happens automatically when a game is created
         val (dm, code) = form
         val newGame = GameEntity.findById(code) ?: throw InvalidGameCode(code)
+        val dmPlayer = PlayerEntity.new {
+            name = dm.name
+            game = newGame
+        }
         DMEntity.new {
             name = dm.name
             game = newGame
+            player = dmPlayer
         }.toModel()
     }
 
@@ -26,6 +32,6 @@ class DMsPostgresRepository: DMsRepository {
 
     override suspend fun delete(id: Int) {
         // No op
-        // this happens automatically when a Game is created
+        // this happens automatically when a Game is deleted
     }
 }

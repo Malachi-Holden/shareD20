@@ -14,7 +14,7 @@ class MockDieRollsRepository(
     override suspend fun create(form: DieRollForm): DieRoll {
         delay(delayMS)
         val id = generateDieRollIds.next()
-        val dieRoll = DieRoll(id, form.gameCode, form.value, form.visibility)
+        val dieRoll = form.toDieRoll(id)
         dieRolls[id] = dieRoll
         return dieRoll
     }

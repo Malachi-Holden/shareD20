@@ -9,14 +9,20 @@ enum class DieRollVisibility{
 @Serializable
 data class DieRollForm(
     val gameCode: String,
+    val rolledBy: Int,
     val value: Int,
-    val visibility: DieRollVisibility
-)
+    val visibility: DieRollVisibility,
+    val fromDM: Boolean
+) {
+    fun toDieRoll(id: Int) = DieRoll(id, gameCode, rolledBy, value, visibility, fromDM)
+}
 
 @Serializable
 data class DieRoll(
     val id: Int,
     val gameCode: String,
+    val rolledBy: Int,
     val value: Int,
-    val visibility: DieRollVisibility
+    val visibility: DieRollVisibility,
+    val fromDM: Boolean
 )

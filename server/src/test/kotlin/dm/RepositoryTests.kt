@@ -6,6 +6,7 @@ import com.holden.dm.DMEntity
 import com.holden.dm.DMsPostgresRepository
 import com.holden.dm.toModel
 import com.holden.game.GameEntity
+import com.holden.player.PlayerEntity
 import org.koin.test.KoinTest
 import org.koin.test.get
 import runTransactionTest
@@ -33,9 +34,14 @@ class RepositoryTests: KoinTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
         }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
+        }
         val dm = DMEntity.new {
             name = "Jack"
             game = newGame
+            player = dmPlayer
         }
         assertEquals(dm.toModel(), dmsRepository.read(dm.id.value))
     }

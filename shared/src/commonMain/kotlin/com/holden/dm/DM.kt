@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DM(
     val id: Int,
+    val playerId: Int,
     val name: String,
     val gameCode: String
 )
@@ -12,6 +13,4 @@ data class DM(
 @Serializable
 data class DMForm(
     val name: String
-) {
-    fun toDM(id: Int, gameCode: String) = DM(id, name, gameCode)
-}
+)

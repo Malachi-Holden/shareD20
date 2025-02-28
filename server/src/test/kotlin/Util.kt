@@ -72,9 +72,9 @@ fun <I, F, D> KoinTest.setupRepositoryTestSuite(
 
 fun tearDownRepositoryTestSuite() {
     transaction {
-        SchemaUtils.drop(PlayersTable)
-        SchemaUtils.drop(DMsTable)
         SchemaUtils.drop(DieRollsTable)
+        SchemaUtils.drop(DMsTable)
+        SchemaUtils.drop(PlayersTable)
         SchemaUtils.drop(GamesTable)
     }
     stopKoin()

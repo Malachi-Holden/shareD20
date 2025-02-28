@@ -8,6 +8,7 @@ import com.holden.dm.MockDMsRepository
 import com.holden.game.MockGamesRepository
 import com.holden.player.MockPlayersRepository
 import com.holden.player.Player
+import com.holden.player.PlayerForm
 
 fun generateSequentialIds(): Sequence<Int> {
     var current = 0
@@ -30,7 +31,10 @@ class MockD20Repository(
         addPlayerToGame = ::addPlayerToGame,
         removePlayerFromGame = ::removePlayerFromGame
     )
-    override val dmsRepository = MockDMsRepository(delayMS = delayMS)
+    override val dmsRepository = MockDMsRepository(
+        delayMS = delayMS,
+        createPlayer = ::createPlayer
+    )
     override val dieRollsRepository = MockDieRollsRepository(
         delayMS = delayMS
     )
@@ -45,6 +49,10 @@ class MockD20Repository(
 
     fun removePlayerFromGame(playerId: Int, gameCode: String) {
         gamesRepository.removePlayerFromGame(playerId, gameCode)
+    }
+
+    suspend fun createPlayer(form: DMForm, gameCode: String): Player {
+        return playersRepository.create(PlayerForm(form.name, gameCode))
     }
 
     fun removeDMForGame(gameCode: String) {
