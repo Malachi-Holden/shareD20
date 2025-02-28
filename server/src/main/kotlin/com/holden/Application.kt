@@ -2,6 +2,8 @@ package com.holden
 
 import com.holden.di.ConnectionType
 import com.holden.di.initKoin
+import com.holden.dieRolls.DieRollsTable
+import com.holden.dieRolls.dieRollsRoutes
 import com.holden.game.GamesTable
 import com.holden.game.gamesRoutes
 import com.holden.dm.DMsTable
@@ -27,6 +29,7 @@ fun main(args: Array<String>) {
     transaction {
         SchemaUtils.create(PlayersTable)
         SchemaUtils.create(DMsTable)
+        SchemaUtils.create(DieRollsTable)
         SchemaUtils.create(GamesTable)
     }
     val module = repositoryModule(koin.get(), Application::module)
@@ -59,8 +62,9 @@ fun Application.module(
         get("/") {
             call.respondText("Welcome to shareD20")
         }
-        gamesRoutes(repository)
-        playersRoutes(repository)
-        dmsRoutes(repository)
+        gamesRoutes(repository.gamesRepository)
+        playersRoutes(repository.playersRepository)
+        dmsRoutes(repository.dmsRepository)
+        dieRollsRoutes(repository.dieRollsRepository)
     }
 }

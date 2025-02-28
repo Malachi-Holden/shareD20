@@ -7,11 +7,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Routing.playersRoutes(repository: D20Repository) = route("players") {
+fun Routing.playersRoutes(repository: PlayersRepository) = route("players") {
     post {
         try {
             val form = call.receive<PlayerForm>()
-            val newPlayer = repository.playersRepository.create(form)
+            val newPlayer = repository.create(form)
             call.respond(newPlayer)
         } catch (e: InvalidGameCode) {
             call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
@@ -25,7 +25,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {
-            call.respond(repository.playersRepository.read(id ?: throw InvalidPlayerId(null)))
+            call.respond(repository.read(id ?: throw InvalidPlayerId(null)))
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }
@@ -34,7 +34,7 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     delete("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {
-            repository.playersRepository.delete(id  ?: throw InvalidPlayerId(null))
+            repository.delete(id  ?: throw InvalidPlayerId(null))
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
