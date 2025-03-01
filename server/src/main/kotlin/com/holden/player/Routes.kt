@@ -1,4 +1,4 @@
-package com.holden.players
+package com.holden.player
 
 import com.holden.*
 import io.ktor.http.*
@@ -7,11 +7,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Routing.playersRoutes(repository: D20Repository) = route("players") {
+fun Routing.playersRoutes(repository: PlayersRepository) = route("players") {
     post {
         try {
             val form = call.receive<PlayerForm>()
-            val newPlayer = repository.createPlayer(form)
+            val newPlayer = repository.create(form)
             call.respond(newPlayer)
         } catch (e: InvalidGameCode) {
             call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
@@ -23,18 +23,27 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     }
 
     get("/{id}") {
-        val id = call.pathParameters["id"]?.toInt()
+        val id = call.pathParameters["id"]?.toInt() ?: throw InvalidPlayerId(null)
         try {
-            call.respond(repository.getPlayer(id))
+            call.respond(repository.retrieve(id))
+        } catch (e: InvalidPlayerId) {
+            call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
+        }
+    }
+
+    get("/{id}/dieRolls") {
+        val id = call.pathParameters["id"]?.toInt() ?: throw InvalidPlayerId(null)
+        try {
+            call.respond(repository.retreiveDieRolls(id))
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }
     }
 
     delete("/{id}") {
-        val id = call.pathParameters["id"]?.toInt()
+        val id = call.pathParameters["id"]?.toInt() ?: throw InvalidPlayerId(null)
         try {
-            repository.deletePlayer(id)
+            repository.delete(id)
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
@@ -42,13 +51,3 @@ fun Routing.playersRoutes(repository: D20Repository) = route("players") {
     }
 }
 
-fun Routing.dmsRoutes(repository: D20Repository) = route("dms") {
-    get("/{id}") {
-        val id = call.pathParameters["id"]?.toInt()
-        try {
-            call.respond(repository.getDM(id))
-        } catch (e: InvalidDMId) {
-            call.respond(HttpStatusCode.NotFound, "InvalidDMId")
-        }
-    }
-}

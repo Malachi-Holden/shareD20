@@ -1,7 +1,14 @@
 package com.holden
 
-import com.holden.util.removeAll
-import kotlinx.coroutines.delay
+import com.holden.dieRoll.DieRoll
+import com.holden.dieRoll.MockDieRollsRepository
+import com.holden.dm.DM
+import com.holden.dm.DMForm
+import com.holden.dm.MockDMsRepository
+import com.holden.game.MockGamesRepository
+import com.holden.player.MockPlayersRepository
+import com.holden.player.Player
+import com.holden.player.PlayerForm
 
 fun generateSequentialIds(): Sequence<Int> {
     var current = 0
@@ -10,92 +17,63 @@ fun generateSequentialIds(): Sequence<Int> {
     }
 }
 
-fun generateSequentialGameCodes() = generateSequentialIds().map { it.toString().padStart(8, '0') }.iterator()
-
-
-/**
- * Fake repository that uses an in memory hashmap to replicate database behavior
- */
 class MockD20Repository(
-    val delayMS: Long = 0
+    delayMS: Long = 0
 ): D20Repository {
-    val games: MutableMap<String, Game> = mutableMapOf()
-    val players: MutableMap<Int, Player> = mutableMapOf()
-    val dms: MutableMap<Int, DM> = mutableMapOf()
-    private val generateCodes: Iterator<String> = generateSequentialGameCodes()
-    private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
-    private val generateDMIds: Iterator<Int> = generateSequentialIds().iterator()
+    override val gamesRepository = MockGamesRepository(
+        delayMS = delayMS,
+        createDM = ::createDM,
+        removePlayersInGame = ::removePlayersInGame,
+        removeDMForGame = ::removeDMForGame,
+        retreivePlayersFromRepo = ::retreivePlayersFromPlayerRepo
+    )
 
-    override suspend fun addGame(form: GameForm): Game {
-        delay(delayMS)
-        val code = generateCodes.next()
-        val dm = form.dm.toDM(generateDMIds.next(), code)
-        val newGame = Game(code, form.name, dm, listOf())
-        games[code] = newGame
-        dms[dm.id] = dm
-        return newGame
+    override val playersRepository = MockPlayersRepository(
+        delayMS = delayMS,
+        gameExists = ::gameExists,
+        retrieveDieRollsFromRepo = ::retrieveDieRollsFromRepo
+    )
+
+    override val dmsRepository = MockDMsRepository(
+        delayMS = delayMS,
+        createPlayer = ::createPlayer
+    )
+
+    override val dieRollsRepository = MockDieRollsRepository(
+        delayMS = delayMS,
+        gameExists = ::gameExists,
+        playerExists = ::playerExists
+    )
+
+    suspend fun createDM(form: Pair<DMForm, String>): DM {
+        return dmsRepository.create(form)
     }
 
-    override suspend fun deleteGame(code: String?) {
-        delay(delayMS)
-        games.remove(code) ?: throw InvalidGameCode(code)
-        players.removeAll { _, player -> player.gameCode == code }
-        dms.removeAll { _, dm -> dm.gameCode == code }
+    fun removePlayersInGame(gameCode: String) {
+        playersRepository.deletePlayersInGame(gameCode)
     }
 
-    override suspend fun getGameByCode(code: String?): Game {
-        delay(delayMS)
-        return games[code] ?: throw InvalidGameCode(code)
+    suspend fun createPlayer(form: DMForm, gameCode: String): Player {
+        return playersRepository.create(PlayerForm(form.name, gameCode))
     }
 
-    private fun addPlayerToGame(playerId: Int?, gameCode: String?) {
-        if (playerId == null) throw InvalidPlayerId(null)
-        if (gameCode == null) throw InvalidGameCode(null)
-        val game = games[gameCode] ?: throw InvalidGameCode(gameCode)
-        val player = players[playerId] ?: throw InvalidPlayerId(playerId)
-        games[gameCode] = game.copy(
-            players = game.players + player
-        )
-        players[playerId] = player.copy(
-            gameCode = gameCode
-        )
+    fun removeDMForGame(gameCode: String) {
+        dmsRepository.removeDMForGame(gameCode)
     }
 
-    override suspend fun hasGameWithCode(code: String?): Boolean {
-        delay(delayMS)
-        return games.contains(code)
+    suspend fun retreivePlayersFromPlayerRepo(gameCode: String): List<Player> {
+        return playersRepository.players.filterValues { it.gameCode == gameCode }.values.toList()
     }
 
-    override suspend fun createPlayer(form: PlayerForm): Player {
-        delay(delayMS)
-        val id = generatePlayerIds.next()
-        val player = Player(id, form.name, form.gameCode)
-        players[id] = player
-        addPlayerToGame(id, form.gameCode)
-        return player
+    fun gameExists(gameCode: String): Boolean {
+        return gamesRepository.games.containsKey(gameCode)
     }
 
-    override suspend fun deletePlayer(id: Int?) {
-        delay(delayMS)
-        players.remove(id) ?: throw InvalidPlayerId(id)
+    fun playerExists(id: Int): Boolean {
+        return playersRepository.players.containsKey(id)
     }
 
-    override suspend fun getPlayer(id: Int?): Player {
-        delay(delayMS)
-        return players[id] ?: throw InvalidPlayerId(id)
-    }
-    override suspend fun hasPlayer(id: Int?): Boolean {
-        delay(delayMS)
-        return players.containsKey(id)
-    }
-
-    override suspend fun getDM(id: Int?): DM {
-        delay(delayMS)
-        return dms[id] ?: throw InvalidDMId(id)
-    }
-
-    override suspend fun hasDM(id: Int?): Boolean {
-        delay(delayMS)
-        return dms.containsKey(id)
+    fun retrieveDieRollsFromRepo(id: Int): List<DieRoll> {
+        return dieRollsRepository.dieRolls.filterValues { it.rolledBy == id }.values.toList()
     }
 }

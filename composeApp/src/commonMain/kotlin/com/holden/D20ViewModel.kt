@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.holden.game.Game
+import com.holden.game.GameForm
+import com.holden.dm.DM
+import com.holden.player.Player
+import com.holden.player.PlayerForm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
@@ -23,8 +28,8 @@ class D20ViewModel: ViewModel(), KoinComponent {
     fun onJoin(form: PlayerForm) {
         viewModelScope.launch {
             try {
-                val playerFromServer: Player = repository.createPlayer(form)
-                val game: Game = repository.getGameByCode(form.gameCode)
+                val playerFromServer: Player = repository.playersRepository.create(form)
+                val game: Game = repository.gamesRepository.retrieve(form.gameCode)
                 goToPlayingGame(playerFromServer, game)
             } catch (e: InvalidGameCode) {
                 _appState.value = AppState.ErrorState(e)
@@ -36,7 +41,7 @@ class D20ViewModel: ViewModel(), KoinComponent {
 
     fun onCreateGame(form: GameForm) {
         viewModelScope.launch {
-            val game: Game = repository.addGame(form)
+            val game: Game = repository.gamesRepository.create(form)
             val dm = game.dm
             goToDMingGame(dm, game)
         }

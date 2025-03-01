@@ -1,4 +1,7 @@
 import com.holden.*
+import com.holden.game.GameForm
+import com.holden.dm.DMForm
+import com.holden.player.PlayerForm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -6,7 +9,6 @@ import kotlinx.coroutines.test.*
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import kotlin.test.*
@@ -54,15 +56,15 @@ class D20ViewModelTests : KoinTest {
 
     @Test
     fun `goToPlayingGame should put the view into the playinggame state`() = runTest {
-        val game = repository.addGame(GameForm("test game", DMForm("Test DM")))
-        val player = repository.createPlayer(PlayerForm("James", game.code))
+        val game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
+        val player = repository.playersRepository.create(PlayerForm("James", game.code))
         viewModel.goToPlayingGame(player, game)
         assertEquals(AppState.PlayingGame(player, game), viewModel.getCurrentAppState())
     }
 
     @Test
     fun `goToDMingGame should put the view into the dminggame state`() = runTest {
-        val game = repository.addGame(GameForm("test game", DMForm("Test DM")))
+        val game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
         viewModel.goToDMingGame(game.dm, game)
         assertEquals(AppState.DMingGame(game.dm, game), viewModel.getCurrentAppState())
     }
@@ -74,20 +76,20 @@ class D20ViewModelTests : KoinTest {
         advanceUntilIdle()
         assertIs<AppState.DMingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.DMingGame
-        val game = repository.getGameByCode(state.game.code)
+        val game = repository.gamesRepository.retrieve(state.game.code)
         assertEquals(game, state.game)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `onjoin should create the player and join the game`() = runTest {
-        var game = repository.addGame(GameForm("test game", DMForm("Test DM")))
+        var game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
         viewModel.onJoin(PlayerForm("john", game.code))
         advanceUntilIdle()
         assertIs<AppState.PlayingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.PlayingGame
-        val player = repository.getPlayer(state.player.id)
-        game = repository.getGameByCode(game.code)
+        val player = repository.playersRepository.retrieve(state.player.id)
+        game = repository.gamesRepository.retrieve(game.code)
         assertEquals(player, state.player)
         assertEquals(game, state.game)
     }

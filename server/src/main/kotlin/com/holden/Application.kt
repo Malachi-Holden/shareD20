@@ -2,12 +2,14 @@ package com.holden
 
 import com.holden.di.ConnectionType
 import com.holden.di.initKoin
-import com.holden.games.GamesTable
-import com.holden.games.gamesRoutes
-import com.holden.players.DMTable
-import com.holden.players.PlayersTable
-import com.holden.players.dmsRoutes
-import com.holden.players.playersRoutes
+import com.holden.dieRolls.DieRollsTable
+import com.holden.dieRolls.dieRollsRoutes
+import com.holden.game.GamesTable
+import com.holden.game.gamesRoutes
+import com.holden.dm.DMsTable
+import com.holden.player.PlayersTable
+import com.holden.dm.dmsRoutes
+import com.holden.player.playersRoutes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -17,7 +19,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.qualifier.named
@@ -27,7 +28,8 @@ fun main(args: Array<String>) {
     koin.get<DatabaseFactory>(named(ConnectionType.getFromArgs(args))).connect()
     transaction {
         SchemaUtils.create(PlayersTable)
-        SchemaUtils.create(DMTable)
+        SchemaUtils.create(DMsTable)
+        SchemaUtils.create(DieRollsTable)
         SchemaUtils.create(GamesTable)
     }
     val module = repositoryModule(koin.get(), Application::module)
@@ -60,8 +62,9 @@ fun Application.module(
         get("/") {
             call.respondText("Welcome to shareD20")
         }
-        gamesRoutes(repository)
-        playersRoutes(repository)
-        dmsRoutes(repository)
+        gamesRoutes(repository.gamesRepository)
+        playersRoutes(repository.playersRepository)
+        dmsRoutes(repository.dmsRepository)
+        dieRollsRoutes(repository.dieRollsRepository)
     }
 }
