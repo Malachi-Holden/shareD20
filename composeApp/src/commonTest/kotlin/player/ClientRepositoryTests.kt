@@ -5,6 +5,7 @@ import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
 import com.holden.dm.DMForm
 import com.holden.game.GameForm
+import com.holden.hasDataWithId
 import com.holden.player.PlayerForm
 import kotlinx.coroutines.test.runTest
 import org.koin.core.qualifier.named
@@ -65,6 +66,16 @@ class ClientRepositoryTests : KoinTest {
         assertFailsWith<InvalidPlayerId> {
             clientRepository.playersRepository.retrieve(666)
         }
+    }
+
+    @Test
+    fun `delete player should correctly delete player`() = runTest {
+        val gameCode = testGame().code
+        val form = PlayerForm("Jack", gameCode)
+        val playerFromServer = serverRepository.playersRepository.create(form)
+        assertTrue(serverRepository.playersRepository.hasDataWithId(playerFromServer.id))
+        clientRepository.playersRepository.delete(playerFromServer.id)
+        assertFalse(serverRepository.playersRepository.hasDataWithId(playerFromServer.id))
     }
 
     @Test

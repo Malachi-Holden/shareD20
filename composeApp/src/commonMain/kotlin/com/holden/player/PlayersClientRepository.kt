@@ -1,5 +1,6 @@
 package com.holden.player
 
+import com.holden.dieRoll.DieRoll
 import com.holden.getHttpError
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -35,5 +36,13 @@ class PlayersClientRepository: PlayersRepository, KoinComponent {
         if (!response.status.isSuccess()) {
             throw getHttpError(response, null, id)
         }
+    }
+
+    override suspend fun retreiveDieRolls(playerId: Int): List<DieRoll> {
+        val response = client.get("/players/$playerId/dieRolls")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, null, playerId)
+        }
+        return response.body()
     }
 }

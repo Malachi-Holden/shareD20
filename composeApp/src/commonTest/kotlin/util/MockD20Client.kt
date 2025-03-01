@@ -1,6 +1,7 @@
 package util
 
 import com.holden.*
+import com.holden.dieRoll.DieRollForm
 import com.holden.game.GameForm
 import com.holden.player.PlayerForm
 import io.ktor.client.*
@@ -37,6 +38,14 @@ fun mockHttpClient(serverRepository: D20Repository) = HttpClient(
             "dms" -> {
                 when (request.method) {
                     HttpMethod.Get -> getDM(pathSegments, serverRepository)
+                    else -> error("Unrecognized method ${request.method} for endpoint ${request.url.encodedPath}")
+                }
+            }
+            "dieRolls" -> {
+                when (request.method) {
+                    HttpMethod.Post -> postDieRoll(bodyText, serverRepository)
+                    HttpMethod.Get -> getDieRoll(pathSegments, serverRepository)
+                    HttpMethod.Delete -> deleteDieRoll(pathSegments, serverRepository)
                     else -> error("Unrecognized method ${request.method} for endpoint ${request.url.encodedPath}")
                 }
             }
@@ -154,4 +163,39 @@ private suspend fun MockRequestHandleScope.getDM(
         return notFound("InvalidDMId")
     }
     return success(dm)
+}
+
+private suspend fun MockRequestHandleScope.postDieRoll(
+    bodyText: String?,
+    serverRepository: D20Repository
+): HttpResponseData {
+    val form: DieRollForm = Json.decodeFromString(bodyText ?: return failedToParse()) ?: return failedToParse()
+    val roll = serverRepository.dieRollsRepository.create(form)
+    return success(roll)
+}
+
+private suspend fun MockRequestHandleScope.getDieRoll(
+    pathSegments: List<String>,
+    serverRepository: D20Repository
+): HttpResponseData {
+    val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
+    val roll = try {
+        serverRepository.dieRollsRepository.retrieve(id)
+    } catch (e: InvalidDieRollId) {
+        return notFound("InvalidDieRollId")
+    }
+    return success(roll)
+}
+
+private suspend fun MockRequestHandleScope.deleteDieRoll(
+    pathSegments: List<String>,
+    serverRepository: D20Repository
+): HttpResponseData {
+    val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
+    try {
+        serverRepository.dieRollsRepository.delete(id)
+    } catch (e: InvalidDieRollId) {
+        return notFound("InvalidDieRollId")
+    }
+    return noContent()
 }

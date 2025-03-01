@@ -2,13 +2,15 @@ package com.holden.player
 
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
+import com.holden.dieRoll.DieRoll
 import com.holden.generateSequentialIds
 import com.holden.util.removeAll
 import kotlinx.coroutines.delay
 
 class MockPlayersRepository(
     val delayMS: Long = 0,
-    val gameExists: (code: String) -> Boolean
+    val gameExists: (code: String) -> Boolean,
+    val retrieveDieRollsFromRepo: (id: Int) -> List<DieRoll>
 ): PlayersRepository {
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
     val players: MutableMap<Int, Player> = mutableMapOf()
@@ -34,5 +36,10 @@ class MockPlayersRepository(
 
     fun deletePlayersInGame(gameCode: String) {
         players.removeAll { _, player -> player.gameCode == gameCode }
+    }
+
+    override suspend fun retreiveDieRolls(playerId: Int): List<DieRoll> {
+        if (!players.containsKey(playerId)) throw InvalidPlayerId(playerId)
+        return retrieveDieRollsFromRepo(playerId)
     }
 }

@@ -1,7 +1,11 @@
 package player
 
+import assertContentEqualsOrderless
 import com.holden.D20Repository
 import com.holden.MockD20Repository
+import com.holden.dieRoll.DieRoll
+import com.holden.dieRoll.DieRollForm
+import com.holden.dieRoll.DieRollVisibility
 import com.holden.dm.DMForm
 import com.holden.game.Game
 import com.holden.game.GameForm
@@ -100,6 +104,36 @@ class RoutesTests: KoinTest {
     @Test
     fun `delete player should fail if id is bad`() = d20TestApplication(repository) { client ->
         val response = client.delete("/players/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidPlayerId", response.bodyAsText())
+    }
+
+    @Test
+    fun `get dierolls should return correct die rolls`() = d20TestApplication(repository) { client ->
+        val testGame = repository.gamesRepository.create(GameForm(name = "hello world", testDM))
+        val player = repository.playersRepository.create(PlayerForm("new player", testGame.code))
+        val roll1 = repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            player.id,
+            20,
+            DieRollVisibility.All,
+            false
+        ))
+        val roll2 = repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            player.id,
+            20,
+            DieRollVisibility.All,
+            false
+        ))
+        val response = client.get("/players/${player.id}/dieRolls")
+        val rolls: List<DieRoll> = response.body()
+        assertContentEqualsOrderless(listOf(roll1, roll2), rolls)
+    }
+
+    @Test
+    fun `get dieRolls should fail if player id is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/players/666/dieRolls")
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals("InvalidPlayerId", response.bodyAsText())
     }

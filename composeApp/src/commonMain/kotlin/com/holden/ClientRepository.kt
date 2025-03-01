@@ -26,7 +26,8 @@ suspend fun getHttpError(
                 "InvalidGameCode" -> InvalidGameCode(code)
                 "InvalidPlayerId" -> InvalidPlayerId(id)
                 "InvalidDMId" -> InvalidDMId(id)
-                "NoDMFoundWithGameCode" -> InvalidGameCode(code)
+                "InvalidDieRollId" -> InvalidDieRollId(id)
+                "NoDMFoundWithGameCode" -> NoDMFoundWithGameCode(code)
                 else -> GenericHttpError("")
             }
         }

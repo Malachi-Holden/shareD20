@@ -1,5 +1,6 @@
 package game
 
+import assertContentEqualsOrderless
 import com.holden.InvalidGameCode
 import com.holden.dm.*
 import com.holden.game.*
@@ -128,6 +129,41 @@ class RepositoryTests: KoinTest {
             assertNull(PlayerEntity.findById(dm.playerId))
             assertNull(PlayerEntity.findById(player1.id))
             assertNull(PlayerEntity.findById(player2.id))
+        }
+    }
+
+    @Test
+    fun `retrieve players should return the correct list of players`() = runTransactionTest {
+        val newGame = GameEntity.new("00000000") {
+            name = "Hello world"
+        }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
+        }
+        DMEntity.new {
+            name = "Jack"
+            game = newGame
+            player = dmPlayer
+        }.toModel()
+        val player1 = PlayerEntity.new {
+            name = "john"
+            game = newGame
+        }.toModel()
+        val player2 = PlayerEntity.new {
+            name = "jane"
+            game = newGame
+        }.toModel()
+
+        val players = gamesRepository.retreivePlayers(newGame.code.value)
+
+        assertContentEqualsOrderless(players, listOf(player1, player2, dmPlayer.toModel()))
+    }
+
+    @Test
+    fun `retrieve players should fail if gamecode is bad`() = runTransactionTest {
+        assertFailsWith<InvalidGameCode> {
+            gamesRepository.retreivePlayers("666")
         }
     }
 }

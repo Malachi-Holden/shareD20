@@ -44,6 +44,7 @@ class GamesPostgresRepository: GamesRepository, KoinComponent {
     }
 
     override suspend fun retreivePlayers(code: String): List<Player> = transaction {
+        GameEntity.findById(code) ?: throw InvalidGameCode(code)
         PlayerEntity
             .find(PlayersTable.gameCode eq code)
             .map { it.toModel() }

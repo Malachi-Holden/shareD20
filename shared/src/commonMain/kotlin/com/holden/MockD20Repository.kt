@@ -25,16 +25,20 @@ class MockD20Repository(
         createDM = ::createDM,
         removePlayersInGame = ::removePlayersInGame,
         removeDMForGame = ::removeDMForGame,
-        retreivePlayersFromPlayerRepo = ::retreivePlayersFromPlayerRepo
+        retreivePlayersFromRepo = ::retreivePlayersFromPlayerRepo
     )
+
     override val playersRepository = MockPlayersRepository(
         delayMS = delayMS,
-        gameExists = ::gameExists
+        gameExists = ::gameExists,
+        retrieveDieRollsFromRepo = ::retrieveDieRollsFromRepo
     )
+
     override val dmsRepository = MockDMsRepository(
         delayMS = delayMS,
         createPlayer = ::createPlayer
     )
+
     override val dieRollsRepository = MockDieRollsRepository(
         delayMS = delayMS
     )
@@ -61,5 +65,9 @@ class MockD20Repository(
 
     fun gameExists(gameCode: String): Boolean {
         return gamesRepository.games.containsKey(gameCode)
+    }
+
+    fun retrieveDieRollsFromRepo(id: Int): List<DieRoll> {
+        return dieRollsRepository.dieRolls.filterValues { it.rolledBy == id }.values.toList()
     }
 }

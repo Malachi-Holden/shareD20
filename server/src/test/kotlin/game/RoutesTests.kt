@@ -1,11 +1,15 @@
 package game
 
+import assertContentEqualsOrderless
 import com.holden.D20Repository
+import com.holden.InvalidGameCode
 import com.holden.MockD20Repository
 import com.holden.dm.DMForm
 import com.holden.game.Game
 import com.holden.game.GameForm
 import com.holden.hasDataWithId
+import com.holden.player.Player
+import com.holden.player.PlayerForm
 import d20TestApplication
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -64,7 +68,7 @@ class RoutesTests: KoinTest {
     }
 
     @Test
-    fun `getGame should fail if code is bad`() = d20TestApplication(repository) { client ->
+    fun `get Game should fail if code is bad`() = d20TestApplication(repository) { client ->
         val response = client.get("/games/666")
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals("InvalidGameCode", response.bodyAsText())
@@ -87,6 +91,26 @@ class RoutesTests: KoinTest {
     @Test
     fun `delete game should fail if code is bad`() = d20TestApplication(repository) { client ->
         val response = client.delete("/games/666")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidGameCode", response.bodyAsText())
+    }
+
+    @Test
+    fun `retrieve players should return the correct players`() = d20TestApplication(repository) { client ->
+        val game = repository.gamesRepository.create(GameForm(name = "hello world", testDM))
+        val dmPlayer = repository.playersRepository.retrieve(game.dm.playerId)
+        val player1 = repository.playersRepository.create(PlayerForm("player 1", game.code))
+        val player2 = repository.playersRepository.create(PlayerForm("player 2", game.code))
+
+        val response = client.get("/games/${game.code}/players")
+        assertEquals(HttpStatusCode.OK, response.status)
+        val players: List<Player> = response.body()
+        assertContentEqualsOrderless(listOf(dmPlayer, player1, player2), players)
+    }
+
+    @Test
+    fun `retrieve players should fail if game code is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/games/666/players")
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals("InvalidGameCode", response.bodyAsText())
     }

@@ -21,6 +21,7 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
 
 
 class MockGenerator: GenerateCodes {
@@ -78,4 +79,19 @@ fun tearDownRepositoryTestSuite() {
         SchemaUtils.drop(GamesTable)
     }
     stopKoin()
+}
+
+/**
+ * Tests that [iterable1] and [iterable2] have the same content, ignoring order
+ */
+fun <T>assertContentEqualsOrderless(iterable1: Iterable<T>, iterable2: Iterable<T>) {
+    val multiSet1 = iterable1.toMultiSet()
+    val multiSet2 = iterable2.toMultiSet()
+    assertEquals(multiSet1, multiSet2)
+}
+
+fun <T>Iterable<T>.toMultiSet() = buildMap {
+    for (item in this@toMultiSet) {
+        this[item] = (this[item] ?: 0) + 1
+    }
 }

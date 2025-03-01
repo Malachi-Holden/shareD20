@@ -14,7 +14,7 @@ class MockGamesRepository(
     val createDM: suspend (Pair<DMForm, String>) -> DM,
     val removePlayersInGame: suspend (gameCode: String) -> Unit,
     val removeDMForGame: suspend (gameCode: String) -> Unit,
-    val retreivePlayersFromPlayerRepo: suspend (gameCode: String) -> List<Player>
+    val retreivePlayersFromRepo: suspend (gameCode: String) -> List<Player>
 ): GamesRepository {
     val games: MutableMap<String, Game> = mutableMapOf()
     private val generateCodes: Iterator<String> = generateSequentialGameCodes()
@@ -43,5 +43,8 @@ class MockGamesRepository(
         removeDMForGame(id)
     }
 
-    override suspend fun retreivePlayers(code: String): List<Player> = retreivePlayersFromPlayerRepo(code)
+    override suspend fun retreivePlayers(code: String): List<Player> {
+        if (!games.containsKey(code)) throw InvalidGameCode(code)
+        return retreivePlayersFromRepo(code)
+    }
 }
