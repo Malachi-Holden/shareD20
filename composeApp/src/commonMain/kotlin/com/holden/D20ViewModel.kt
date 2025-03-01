@@ -29,7 +29,7 @@ class D20ViewModel: ViewModel(), KoinComponent {
         viewModelScope.launch {
             try {
                 val playerFromServer: Player = repository.playersRepository.create(form)
-                val game: Game = repository.gamesRepository.read(form.gameCode)
+                val game: Game = repository.gamesRepository.retrieve(form.gameCode)
                 goToPlayingGame(playerFromServer, game)
             } catch (e: InvalidGameCode) {
                 _appState.value = AppState.ErrorState(e)

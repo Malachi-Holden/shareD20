@@ -2,8 +2,9 @@ package com.holden.player
 
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
-import com.holden.PlayersRepository
 import com.holden.game.GameEntity
+import com.holden.game.GamesTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class PlayersPostgresRepository: PlayersRepository {
@@ -16,7 +17,7 @@ class PlayersPostgresRepository: PlayersRepository {
         }.toModel()
     }
 
-    override suspend fun read(id: Int): Player = transaction {
+    override suspend fun retrieve(id: Int): Player = transaction {
         PlayerEntity
             .findById(id)
             ?.toModel()

@@ -1,20 +1,15 @@
 package game
 
-import com.holden.GamesRepository
 import com.holden.InvalidGameCode
-import com.holden.dm.DM
-import com.holden.dm.DMEntity
-import com.holden.dm.DMForm
-import com.holden.dm.toModel
-import com.holden.game.GameEntity
-import com.holden.game.GameForm
-import com.holden.game.GamesPostgresRepository
-import com.holden.game.toModel
+import com.holden.dm.*
+import com.holden.game.*
 import com.holden.hasDataWithId
 import com.holden.player.Player
 import com.holden.player.PlayerEntity
+import com.holden.player.PlayersTable
 import com.holden.player.toModel
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.test.KoinTest
 import org.koin.test.get
@@ -28,7 +23,7 @@ class RepositoryTests: KoinTest {
 
     @BeforeTest
     fun setup() {
-        setupRepositoryTestSuite { GamesPostgresRepository() }
+        setupRepositoryTestSuite<GamesRepository> { GamesPostgresRepository() }
         gamesRepository = get()
     }
 
@@ -38,7 +33,7 @@ class RepositoryTests: KoinTest {
     }
 
     @Test
-    fun `addgame should create a game with the correct attributes`() = runTransactionTest {
+    fun `create game should create a game with the correct attributes`() = runTransactionTest {
         val form = GameForm("Hello world", DMForm("jack"))
         val game = gamesRepository.create(form)
         assertEquals(form.name, game.name)
@@ -48,32 +43,42 @@ class RepositoryTests: KoinTest {
     }
 
     @Test
-    fun `getGame should get the correct game`() = runTransactionTest {
+    fun `retreive game should get the correct game`() = runTransactionTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
+        }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
         }
         DMEntity.new {
             name = "Jack"
             game = newGame
+            player = dmPlayer
         }
-        val gameFromRepo = gamesRepository.read("00000000")
+        val gameFromRepo = gamesRepository.retrieve("00000000")
         assertEquals(newGame.toModel(), gameFromRepo)
     }
 
     @Test
-    fun `getGame should fail if code is bad`() = runTransactionTest {
+    fun `retreive Game should fail if code is bad`() = runTransactionTest {
         assertFailsWith<InvalidGameCode> {
-            gamesRepository.read("666")
+            gamesRepository.retrieve("666")
         }
     }
 
     @Test
-    fun `deletegame should remove the game`() = runTransactionTest {
+    fun `delete game should remove the game`() = runTransactionTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
         }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
+        }
         DMEntity.new {
             name = "Jack"
+            player = dmPlayer
             game = newGame
         }
 
@@ -83,14 +88,14 @@ class RepositoryTests: KoinTest {
     }
 
     @Test
-    fun `deletegame should fail if code is bad`() = runTransactionTest {
+    fun `delete game should fail if code is bad`() = runTransactionTest {
         assertFailsWith<InvalidGameCode> {
             gamesRepository.delete("666")
         }
     }
 
     @Test
-    fun `deletegame should delete all its players and its dm`() = runTest {
+    fun `delete game should delete all its players and its dm`() = runTest {
         lateinit var newGame: GameEntity
         lateinit var dm: DM
         lateinit var player1: Player
@@ -99,9 +104,14 @@ class RepositoryTests: KoinTest {
             newGame = GameEntity.new("00000000") {
                 name = "Hello world"
             }
+            val dmPlayer = PlayerEntity.new {
+                name = "Jack"
+                game = newGame
+            }
             dm = DMEntity.new {
                 name = "Jack"
                 game = newGame
+                player = dmPlayer
             }.toModel()
             player1 = PlayerEntity.new {
                 name = "john"
@@ -115,6 +125,7 @@ class RepositoryTests: KoinTest {
         gamesRepository.delete(newGame.code.value)
         transaction {
             assertNull(DMEntity.findById(dm.id))
+            assertNull(PlayerEntity.findById(dm.playerId))
             assertNull(PlayerEntity.findById(player1.id))
             assertNull(PlayerEntity.findById(player2.id))
         }

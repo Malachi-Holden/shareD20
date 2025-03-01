@@ -1,6 +1,5 @@
 package com.holden.dm
 
-import com.holden.DMsRepository
 import com.holden.getHttpError
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -16,7 +15,7 @@ class DMsClientRepository: DMsRepository, KoinComponent {
         error("Cannot directly create DM client-side. Try creating a game instead")
     }
 
-    override suspend fun read(id: Int): DM {
+    override suspend fun retrieve(id: Int): DM {
         val response = client.get("/dms/$id")
         if (!response.status.isSuccess()) {
             throw getHttpError(response, null, id)

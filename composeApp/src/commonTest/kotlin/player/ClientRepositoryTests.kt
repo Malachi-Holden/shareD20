@@ -5,10 +5,7 @@ import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
 import com.holden.dm.DMForm
 import com.holden.game.GameForm
-import com.holden.hasDataWithId
 import com.holden.player.PlayerForm
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.koin.core.qualifier.named
 import org.koin.test.KoinTest
@@ -41,9 +38,9 @@ class ClientRepositoryTests : KoinTest {
         val gameCode = testGame().code
         val form = PlayerForm("Jack", gameCode)
         val player = clientRepository.playersRepository.create(form)
-        val playerFromServer = serverRepository.playersRepository.read(player.id)
+        val playerFromServer = serverRepository.playersRepository.retrieve(player.id)
         assertEquals(playerFromServer, player)
-        assertContains(serverRepository.gamesRepository.read(gameCode).players, player)
+        assertContains(serverRepository.gamesRepository.retreivePlayers(gameCode), player)
     }
 
     @Test
@@ -59,14 +56,14 @@ class ClientRepositoryTests : KoinTest {
         val gameCode = testGame().code
         val form = PlayerForm("Jack", gameCode)
         val playerFromServer = serverRepository.playersRepository.create(form)
-        val player = clientRepository.playersRepository.read(playerFromServer.id)
+        val player = clientRepository.playersRepository.retrieve(playerFromServer.id)
         assertEquals(playerFromServer, player)
     }
 
     @Test
     fun `read player should fail if player doesn't exist`() = runTest {
         assertFailsWith<InvalidPlayerId> {
-            clientRepository.playersRepository.read(666)
+            clientRepository.playersRepository.retrieve(666)
         }
     }
 

@@ -1,7 +1,5 @@
 package com.holden.game
 
-import com.holden.D20Repository
-import com.holden.GamesRepository
 import com.holden.InvalidGameCode
 import io.ktor.http.*
 import io.ktor.serialization.*
@@ -23,18 +21,27 @@ fun Routing.gamesRoutes(repository: GamesRepository) = route("/games") {
     }
 
     get("/{code}") {
-        val code = call.pathParameters["code"]
+        val code = call.pathParameters["code"]?: throw InvalidGameCode(null)
         try {
-            call.respond(repository.read(code ?: throw InvalidGameCode(null)))
+            call.respond(repository.retrieve(code))
+        } catch (e: InvalidGameCode) {
+            call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
+        }
+    }
+
+    get("/{code}/players") {
+        val code = call.pathParameters["code"] ?: throw InvalidGameCode(null)
+        try {
+            call.respond(repository.retreivePlayers(code))
         } catch (e: InvalidGameCode) {
             call.respond(HttpStatusCode.NotFound, "InvalidGameCode")
         }
     }
 
     delete("/{code}") {
-        val code = call.pathParameters["code"]
+        val code = call.pathParameters["code"] ?: throw InvalidGameCode(null)
         try {
-            repository.delete(code ?: throw InvalidGameCode(null))
+            repository.delete(code)
             call.respond(HttpStatusCode.NoContent)
         } catch (e: InvalidGameCode) {
             call.respond(HttpStatusCode.NotFound, "InvalidGameCode")

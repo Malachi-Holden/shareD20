@@ -10,8 +10,7 @@ import kotlinx.serialization.Serializable
 data class Game(
     val code: String,
     val name: String,
-    val dm: DM,
-    val players: List<Player>
+    val dm: DM
 )
 
 @Serializable

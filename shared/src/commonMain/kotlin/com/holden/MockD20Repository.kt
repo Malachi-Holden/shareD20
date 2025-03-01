@@ -24,12 +24,12 @@ class MockD20Repository(
         delayMS = delayMS,
         createDM = ::createDM,
         removePlayersInGame = ::removePlayersInGame,
-        removeDMForGame = ::removeDMForGame
+        removeDMForGame = ::removeDMForGame,
+        retreivePlayersFromPlayerRepo = ::retreivePlayersFromPlayerRepo
     )
     override val playersRepository = MockPlayersRepository(
         delayMS = delayMS,
-        addPlayerToGame = ::addPlayerToGame,
-        removePlayerFromGame = ::removePlayerFromGame
+        gameExists = ::gameExists
     )
     override val dmsRepository = MockDMsRepository(
         delayMS = delayMS,
@@ -47,10 +47,6 @@ class MockD20Repository(
         playersRepository.deletePlayersInGame(gameCode)
     }
 
-    fun removePlayerFromGame(playerId: Int, gameCode: String) {
-        gamesRepository.removePlayerFromGame(playerId, gameCode)
-    }
-
     suspend fun createPlayer(form: DMForm, gameCode: String): Player {
         return playersRepository.create(PlayerForm(form.name, gameCode))
     }
@@ -59,7 +55,11 @@ class MockD20Repository(
         dmsRepository.removeDMForGame(gameCode)
     }
 
-    fun addPlayerToGame(player: Player, gameCode: String) {
-        gamesRepository.addPlayerToGame(player, gameCode)
+    suspend fun retreivePlayersFromPlayerRepo(gameCode: String): List<Player> {
+        return playersRepository.players.filterValues { it.gameCode == gameCode }.values.toList()
+    }
+
+    fun gameExists(gameCode: String): Boolean {
+        return gamesRepository.games.containsKey(gameCode)
     }
 }

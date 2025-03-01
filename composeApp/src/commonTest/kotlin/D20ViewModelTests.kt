@@ -76,7 +76,7 @@ class D20ViewModelTests : KoinTest {
         advanceUntilIdle()
         assertIs<AppState.DMingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.DMingGame
-        val game = repository.gamesRepository.read(state.game.code)
+        val game = repository.gamesRepository.retrieve(state.game.code)
         assertEquals(game, state.game)
     }
 
@@ -88,8 +88,8 @@ class D20ViewModelTests : KoinTest {
         advanceUntilIdle()
         assertIs<AppState.PlayingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.PlayingGame
-        val player = repository.playersRepository.read(state.player.id)
-        game = repository.gamesRepository.read(game.code)
+        val player = repository.playersRepository.retrieve(state.player.id)
+        game = repository.gamesRepository.retrieve(game.code)
         assertEquals(player, state.player)
         assertEquals(game, state.game)
     }

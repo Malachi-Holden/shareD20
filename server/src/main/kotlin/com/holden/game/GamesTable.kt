@@ -35,9 +35,5 @@ class GameEntity(code: EntityID<String>): Entity<String>(code) {
 fun GameEntity.toModel() = Game(
     code = code.value,
     name = name,
-    dm = dm?.toModel() ?: throw NoDMFoundWithGameCode(code.value),
-    players = players
-        .map {
-            it.toModel()
-        },
+    dm = dm?.toModel() ?: throw NoDMFoundWithGameCode(code.value)
 )

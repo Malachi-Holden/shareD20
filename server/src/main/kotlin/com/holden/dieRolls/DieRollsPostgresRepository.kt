@@ -1,11 +1,11 @@
 package com.holden.dieRolls
 
-import com.holden.DieRollsRepository
 import com.holden.InvalidDieRollId
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
 import com.holden.dieRoll.DieRoll
 import com.holden.dieRoll.DieRollForm
+import com.holden.dieRoll.DieRollsRepository
 import com.holden.game.GameEntity
 import com.holden.player.PlayerEntity
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -22,7 +22,7 @@ class DieRollsPostgresRepository: DieRollsRepository {
         }.toModel()
     }
 
-    override suspend fun read(id: Int): DieRoll = transaction {
+    override suspend fun retrieve(id: Int): DieRoll = transaction {
         DieRollEntity.findById(id)?.toModel() ?: throw InvalidDieRollId(id)
     }
 

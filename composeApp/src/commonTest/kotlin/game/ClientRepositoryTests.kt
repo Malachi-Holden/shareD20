@@ -33,7 +33,7 @@ class ClientRepositoryTests: KoinTest {
     fun `create Game should correctly add a game to the database`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val gameFromServer = clientRepository.gamesRepository.create(form)
-        val game = serverRepository.gamesRepository.read(gameFromServer.code)
+        val game = serverRepository.gamesRepository.retrieve(gameFromServer.code)
         assertEquals(game, gameFromServer)
     }
 
@@ -41,14 +41,14 @@ class ClientRepositoryTests: KoinTest {
     fun `read game should get an existing game`() = runTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val gameFromServer = serverRepository.gamesRepository.create(form)
-        val game = clientRepository.gamesRepository.read(gameFromServer.code)
+        val game = clientRepository.gamesRepository.retrieve(gameFromServer.code)
         assertEquals(gameFromServer, game)
     }
 
     @Test
     fun `read game should fail if game does not exist`() = runTest {
         assertFailsWith<InvalidGameCode> {
-            clientRepository.gamesRepository.read("99")
+            clientRepository.gamesRepository.retrieve("99")
         }
     }
 

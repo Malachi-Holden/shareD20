@@ -48,7 +48,7 @@ class RoutesTests: KoinTest {
         }
         assertEquals(HttpStatusCode.OK, response.status)
         val game = response.body<Game>()
-        val gameFromRepo = repository.gamesRepository.read(game.code)
+        val gameFromRepo = repository.gamesRepository.retrieve(game.code)
         assertNotNull(gameFromRepo)
         assertEquals(game, gameFromRepo)
     }
@@ -76,7 +76,7 @@ class RoutesTests: KoinTest {
         val game2 = repository.gamesRepository.create(GameForm(name = "goodbye world", dm = testDM))
         assert(repository.gamesRepository.hasDataWithId(game1.code))
         assert(repository.gamesRepository.hasDataWithId(game2.code))
-        val dmId = repository.gamesRepository.read(game1.code).dm.id
+        val dmId = repository.gamesRepository.retrieve(game1.code).dm.id
         val response = client.delete("/games/${game1.code}")
         assert(response.status.isSuccess())
         assertFalse(repository.gamesRepository.hasDataWithId(game1.code))

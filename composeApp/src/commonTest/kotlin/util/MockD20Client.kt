@@ -88,7 +88,7 @@ private suspend fun MockRequestHandleScope.getGame(
 ): HttpResponseData {
     val code = pathSegments.getOrNull(1) ?: return failedToParse()
     val game = try {
-        serverRepository.gamesRepository.read(code)
+        serverRepository.gamesRepository.retrieve(code)
     } catch (e: InvalidGameCode) {
         return notFound("InvalidGameCode")
     }
@@ -123,7 +123,7 @@ private suspend fun MockRequestHandleScope.getPlayer(
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val player = try {
-        serverRepository.playersRepository.read(id)
+        serverRepository.playersRepository.retrieve(id)
     } catch (e: InvalidPlayerId) {
         return notFound("InvalidPlayerId")
     }
@@ -149,7 +149,7 @@ private suspend fun MockRequestHandleScope.getDM(
 ): HttpResponseData {
     val id = pathSegments.getOrNull(1)?.toIntOrNull() ?: return failedToParse()
     val dm = try {
-        serverRepository.dmsRepository.read(id)
+        serverRepository.dmsRepository.retrieve(id)
     } catch (e: InvalidDMId) {
         return notFound("InvalidDMId")
     }

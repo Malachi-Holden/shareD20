@@ -2,13 +2,9 @@ package player
 
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
-import com.holden.PlayersRepository
 import com.holden.dm.DMEntity
 import com.holden.game.GameEntity
-import com.holden.player.PlayerEntity
-import com.holden.player.PlayerForm
-import com.holden.player.PlayersPostgresRepository
-import com.holden.player.toModel
+import com.holden.player.*
 import org.koin.test.KoinTest
 import org.koin.test.get
 import runTransactionTest
@@ -21,7 +17,7 @@ class RepositoryTests: KoinTest {
 
     @BeforeTest
     fun setup() {
-        setupRepositoryTestSuite { PlayersPostgresRepository() }
+        setupRepositoryTestSuite<PlayersRepository> { PlayersPostgresRepository() }
         playersRepository = get()
     }
 
@@ -35,15 +31,20 @@ class RepositoryTests: KoinTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
         }
-        DMEntity.new {
+        val dmPlayer = PlayerEntity.new {
             name = "Jack"
             game = newGame
         }
-        assertEquals(0, newGame.players.count())
+        DMEntity.new {
+            name = "Jack"
+            player = dmPlayer
+            game = newGame
+        }
+        assertEquals(1, newGame.players.count())
         val player = playersRepository.create(PlayerForm("john", newGame.code.value))
         assertNotNull(PlayerEntity.findById(player.id))
-        assertEquals(1, newGame.players.count())
-        assertEquals(player, newGame.players.first().toModel())
+        assertEquals(2, newGame.players.count())
+        assertContains(newGame.players.map { it.toModel() }, player)
     }
 
     @Test
@@ -58,22 +59,27 @@ class RepositoryTests: KoinTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
         }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
+        }
         DMEntity.new {
             name = "Jack"
             game = newGame
+            player = dmPlayer
         }
         val player = PlayerEntity.new {
             name = "john"
             game = newGame
         }
-        val playerFromRepo = playersRepository.read(player.id.value)
+        val playerFromRepo = playersRepository.retrieve(player.id.value)
         assertEquals(player.toModel(), playerFromRepo)
     }
 
     @Test
     fun `read player should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidPlayerId> {
-            playersRepository.read(666)
+            playersRepository.retrieve(666)
         }
     }
 
@@ -82,18 +88,23 @@ class RepositoryTests: KoinTest {
         val newGame = GameEntity.new("00000000") {
             name = "Hello world"
         }
+        val dmPlayer = PlayerEntity.new {
+            name = "Jack"
+            game = newGame
+        }
         DMEntity.new {
             name = "Jack"
             game = newGame
+            player = dmPlayer
         }
         val player = PlayerEntity.new {
             name = "john"
             game = newGame
         }
         val playerId = player.id.value
-        assertEquals(newGame.players.first().toModel(), player.toModel())
+        assertContains(newGame.players.map { it.toModel() }, player.toModel())
         playersRepository.delete(playerId)
-        assertEquals(0, newGame.players.count())
+        assertEquals(1, newGame.players.count())
         assertNull(PlayerEntity.findById(playerId))
     }
 
@@ -103,4 +114,6 @@ class RepositoryTests: KoinTest {
             playersRepository.delete(666)
         }
     }
+
+    // todo: test deleting player tied to dm cascades
 }

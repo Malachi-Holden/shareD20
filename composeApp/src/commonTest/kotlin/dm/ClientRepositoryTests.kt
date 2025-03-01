@@ -34,7 +34,7 @@ class ClientRepositoryTests : KoinTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val game = clientRepository.gamesRepository.create(form)
         val dm = game.dm
-        val dmFromServer = serverRepository.dmsRepository.read(dm.id)
+        val dmFromServer = serverRepository.dmsRepository.retrieve(dm.id)
         assertEquals(dmFromServer, dm)
     }
 
@@ -43,14 +43,14 @@ class ClientRepositoryTests : KoinTest {
         val form = GameForm("Jack's game", DMForm("Jack"))
         val game = serverRepository.gamesRepository.create(form)
         val dmFromServer = game.dm
-        val dm = clientRepository.dmsRepository.read(dmFromServer.id)
+        val dm = clientRepository.dmsRepository.retrieve(dmFromServer.id)
         assertEquals(dmFromServer, dm)
     }
 
     @Test
     fun `read dm should fail if id is bad`() = runTest {
         assertFailsWith<InvalidDMId> {
-            clientRepository.dmsRepository.read(666)
+            clientRepository.dmsRepository.retrieve(666)
         }
     }
 }

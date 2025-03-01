@@ -1,6 +1,5 @@
 package com.holden.dieRoll
 
-import com.holden.DieRollsRepository
 import com.holden.InvalidDieRollId
 import com.holden.generateSequentialIds
 import kotlinx.coroutines.delay
@@ -19,7 +18,7 @@ class MockDieRollsRepository(
         return dieRoll
     }
 
-    override suspend fun read(id: Int): DieRoll {
+    override suspend fun retrieve(id: Int): DieRoll {
         delay(delayMS)
         return dieRolls[id] ?: throw InvalidDieRollId(id)
     }

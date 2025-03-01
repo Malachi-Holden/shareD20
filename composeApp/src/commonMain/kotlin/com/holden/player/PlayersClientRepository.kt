@@ -1,6 +1,5 @@
 package com.holden.player
 
-import com.holden.PlayersRepository
 import com.holden.getHttpError
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -23,7 +22,7 @@ class PlayersClientRepository: PlayersRepository, KoinComponent {
         return response.body()
     }
 
-    override suspend fun read(id: Int): Player {
+    override suspend fun retrieve(id: Int): Player {
         val response = client.get("/players/$id")
         if (!response.status.isSuccess()) {
             throw getHttpError(response, null, id)

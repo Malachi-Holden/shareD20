@@ -1,7 +1,7 @@
 package com.holden.game
 
-import com.holden.GamesRepository
 import com.holden.getHttpError
+import com.holden.player.Player
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -17,7 +17,7 @@ class GamesClientRepository: GamesRepository, KoinComponent {
         setBody(form)
     }.body()
 
-    override suspend fun read(id: String): Game {
+    override suspend fun retrieve(id: String): Game {
         val response = client.get("/games/$id")
         if (response.status.isSuccess()) {
             return response.body()
@@ -30,5 +30,13 @@ class GamesClientRepository: GamesRepository, KoinComponent {
         if (!response.status.isSuccess()) {
             throw getHttpError(response, id, null)
         }
+    }
+
+    override suspend fun retreivePlayers(code: String): List<Player> {
+        val response = client.get("/games/$code/players")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, code, null)
+        }
+        return response.body()
     }
 }

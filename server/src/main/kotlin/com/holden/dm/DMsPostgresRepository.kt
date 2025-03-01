@@ -1,6 +1,5 @@
 package com.holden.dm
 
-import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import com.holden.InvalidGameCode
 import com.holden.game.GameEntity
@@ -23,7 +22,7 @@ class DMsPostgresRepository: DMsRepository {
         }.toModel()
     }
 
-    override suspend fun read(id: Int): DM = transaction {
+    override suspend fun retrieve(id: Int): DM = transaction {
         DMEntity
             .findById(id)
             ?.toModel()

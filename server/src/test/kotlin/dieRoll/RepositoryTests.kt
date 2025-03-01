@@ -1,11 +1,11 @@
 package dieRoll
 
-import com.holden.DieRollsRepository
 import com.holden.InvalidDieRollId
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
 import com.holden.dieRoll.DieRollForm
 import com.holden.dieRoll.DieRollVisibility
+import com.holden.dieRoll.DieRollsRepository
 import com.holden.dieRolls.DieRollEntity
 import com.holden.dieRolls.DieRollsPostgresRepository
 import com.holden.dieRolls.toModel
@@ -24,7 +24,7 @@ class RepositoryTests: KoinTest {
 
     @BeforeTest
     fun setup() {
-        setupRepositoryTestSuite { DieRollsPostgresRepository() }
+        setupRepositoryTestSuite<DieRollsRepository> { DieRollsPostgresRepository() }
         dieRollsRepository = get()
     }
 
@@ -120,14 +120,14 @@ class RepositoryTests: KoinTest {
             visibility = DieRollVisibility.All.ordinal
             fromDM = true
         }
-        val dieRollFromRepository = dieRollsRepository.read(newDieRoll.id.value)
+        val dieRollFromRepository = dieRollsRepository.retrieve(newDieRoll.id.value)
         assertEquals(newDieRoll.toModel(), dieRollFromRepository)
     }
 
     @Test
     fun `read dieRoll should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidDieRollId> {
-            dieRollsRepository.read(666)
+            dieRollsRepository.retrieve(666)
         }
     }
 

@@ -51,25 +51,8 @@ class RoutesTests: KoinTest {
         assertEquals(HttpStatusCode.OK, response.status)
         val player = response.body<Player>()
         assertEquals("Jane", player.name)
-        val playerFromRepo = repository.playersRepository.read(player.id)
+        val playerFromRepo = repository.playersRepository.retrieve(player.id)
         assertEquals(player.name, playerFromRepo.name)
-    }
-
-    @Test
-    fun `post player should add the player to the game`() = d20TestApplication(repository) { client ->
-        val code = client.post("/games") {
-            contentType(ContentType.Application.Json)
-            setBody(GameForm(name = "hello world", dm = testDM))
-        }.body<Game>().code
-        val response = client.post("/players") {
-            contentType(ContentType.Application.Json)
-            setBody(PlayerForm("Jane", code))
-        }
-        assertEquals(HttpStatusCode.OK, response.status)
-        val player = response.body<Player>()
-        val game = repository.gamesRepository.read(code)
-        assertEquals(game.players.last().name, player.name)
-        assertEquals(game.code, player.gameCode)
     }
 
     @Test

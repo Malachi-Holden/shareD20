@@ -1,6 +1,6 @@
 package com.holden
 
-import com.holden.dieRoll.DieRollsRepository
+import com.holden.dieRoll.DieRollsClientRepository
 import com.holden.dm.DMsClientRepository
 import com.holden.game.GamesClientRepository
 import com.holden.player.PlayersClientRepository
@@ -11,7 +11,7 @@ class ClientRepository: D20Repository {
     override val gamesRepository = GamesClientRepository()
     override val playersRepository = PlayersClientRepository()
     override val dmsRepository = DMsClientRepository()
-    override val dieRollsRepository = DieRollsRepository()
+    override val dieRollsRepository = DieRollsClientRepository()
 }
 
 suspend fun getHttpError(

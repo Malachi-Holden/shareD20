@@ -1,9 +1,9 @@
 package com.holden.dieRolls
 
-import com.holden.DieRollsRepository
 import com.holden.InvalidDieRollId
 import com.holden.InvalidGameCode
 import com.holden.dieRoll.DieRollForm
+import com.holden.dieRoll.DieRollsRepository
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.server.request.*
@@ -28,7 +28,7 @@ fun Routing.dieRollsRoutes(repository: DieRollsRepository) = route("/dieRolls") 
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {
-            call.respond(repository.read(id ?: throw InvalidDieRollId(null)))
+            call.respond(repository.retrieve(id ?: throw InvalidDieRollId(null)))
         } catch (e: InvalidDieRollId) {
             call.respond(HttpStatusCode.NotFound, "InvalidDieRollId")
         }

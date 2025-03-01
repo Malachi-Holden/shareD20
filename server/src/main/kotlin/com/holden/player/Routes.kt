@@ -25,7 +25,7 @@ fun Routing.playersRoutes(repository: PlayersRepository) = route("players") {
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {
-            call.respond(repository.read(id ?: throw InvalidPlayerId(null)))
+            call.respond(repository.retrieve(id ?: throw InvalidPlayerId(null)))
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }

@@ -50,13 +50,13 @@ fun runTransactionTest(statement: suspend Transaction.() -> Unit) = transaction 
     }
 }
 
-fun <I, F, D> KoinTest.setupRepositoryTestSuite(
-    getRepo: () -> CrdRepository<I, F, D>
+inline fun <reified R: CrdRepository<*,*,*>> KoinTest.setupRepositoryTestSuite(
+    crossinline getRepo: () -> R
 ) {
     val repositoryTestModule = module {
         single<DatabaseFactory> { InMemoryDatabaseFactory }
         single<GenerateCodes> { MockGenerator() }
-        single<CrdRepository<I, F, D>> { getRepo() }
+        single<R> { getRepo() }
     }
     startKoin {
         modules(repositoryTestModule)

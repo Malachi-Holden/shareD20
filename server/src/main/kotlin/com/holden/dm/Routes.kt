@@ -1,7 +1,5 @@
 package com.holden.dm
 
-import com.holden.D20Repository
-import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import io.ktor.http.*
 import io.ktor.server.response.*
@@ -11,7 +9,7 @@ fun Routing.dmsRoutes(repository: DMsRepository) = route("dms") {
     get("/{id}") {
         val id = call.pathParameters["id"]?.toInt()
         try {
-            call.respond(repository.read(id ?: throw InvalidDMId(null)))
+            call.respond(repository.retrieve(id ?: throw InvalidDMId(null)))
         } catch (e: InvalidDMId) {
             call.respond(HttpStatusCode.NotFound, "InvalidDMId")
         }

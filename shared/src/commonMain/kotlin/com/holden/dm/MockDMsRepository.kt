@@ -1,6 +1,5 @@
 package com.holden.dm
 
-import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import com.holden.generateSequentialIds
 import com.holden.player.Player
@@ -23,7 +22,7 @@ class MockDMsRepository(
         return dm
     }
 
-    override suspend fun read(id: Int): DM {
+    override suspend fun retrieve(id: Int): DM {
         delay(delayMS)
         return dms[id] ?: throw InvalidDMId(id)
     }

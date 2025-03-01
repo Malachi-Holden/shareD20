@@ -1,9 +1,9 @@
 package dm
 
-import com.holden.DMsRepository
 import com.holden.InvalidDMId
 import com.holden.dm.DMEntity
 import com.holden.dm.DMsPostgresRepository
+import com.holden.dm.DMsRepository
 import com.holden.dm.toModel
 import com.holden.game.GameEntity
 import com.holden.player.PlayerEntity
@@ -19,7 +19,7 @@ class RepositoryTests: KoinTest {
 
     @BeforeTest
     fun setup() {
-        setupRepositoryTestSuite { DMsPostgresRepository() }
+        setupRepositoryTestSuite<DMsRepository> { DMsPostgresRepository() }
         dmsRepository = get()
     }
 
@@ -43,13 +43,13 @@ class RepositoryTests: KoinTest {
             game = newGame
             player = dmPlayer
         }
-        assertEquals(dm.toModel(), dmsRepository.read(dm.id.value))
+        assertEquals(dm.toModel(), dmsRepository.retrieve(dm.id.value))
     }
 
     @Test
     fun `getDM should fail if id is bad`() = runTransactionTest {
         assertFailsWith<InvalidDMId> {
-            dmsRepository.read(666)
+            dmsRepository.retrieve(666)
         }
     }
 }
