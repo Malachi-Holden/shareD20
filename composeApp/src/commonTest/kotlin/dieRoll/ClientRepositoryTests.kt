@@ -100,7 +100,7 @@ class ClientRepositoryTests : KoinTest {
 
     @Test
     fun `read dieroll should fail if dieroll doesn't exist`() = runTest {
-        assertFailsWith<InvalidPlayerId> {
+        assertFailsWith<InvalidDieRollId> {
             clientRepository.dieRollsRepository.retrieve(666)
         }
     }

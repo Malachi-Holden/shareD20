@@ -17,7 +17,7 @@ class DieRollsClientRepository: DieRollsRepository, KoinComponent {
             setBody(form)
         }
         if (!response.status.isSuccess()) {
-            throw getHttpError(response, form.gameCode, null)
+            throw getHttpError(response, form.gameCode, form.rolledBy)
         }
         return response.body()
     }

@@ -40,7 +40,9 @@ class MockD20Repository(
     )
 
     override val dieRollsRepository = MockDieRollsRepository(
-        delayMS = delayMS
+        delayMS = delayMS,
+        gameExists = ::gameExists,
+        playerExists = ::playerExists
     )
 
     suspend fun createDM(form: Pair<DMForm, String>): DM {
@@ -65,6 +67,10 @@ class MockD20Repository(
 
     fun gameExists(gameCode: String): Boolean {
         return gamesRepository.games.containsKey(gameCode)
+    }
+
+    fun playerExists(id: Int): Boolean {
+        return playersRepository.players.containsKey(id)
     }
 
     fun retrieveDieRollsFromRepo(id: Int): List<DieRoll> {
