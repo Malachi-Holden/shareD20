@@ -20,7 +20,7 @@ class GamesPostgresRepository: GamesRepository, KoinComponent {
             name = form.name
         }
         val dmPlayer = PlayerEntity.new {
-            name = form.name
+            name = form.dm.name
             game = newGame
         }
         DMEntity.new {
@@ -44,9 +44,9 @@ class GamesPostgresRepository: GamesRepository, KoinComponent {
     }
 
     override suspend fun retreivePlayers(code: String): List<Player> = transaction {
-        GameEntity.findById(code) ?: throw InvalidGameCode(code)
-        PlayerEntity
-            .find(PlayersTable.gameCode eq code)
-            .map { it.toModel() }
+        val game = GameEntity.findById(code) ?: throw InvalidGameCode(code)
+        val result = game.players.map { it.toModel() }
+        println("the games: ${result.joinToString()}")
+        result
     }
 }

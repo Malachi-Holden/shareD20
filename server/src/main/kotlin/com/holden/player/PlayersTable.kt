@@ -1,5 +1,7 @@
 package com.holden.player
 
+import com.holden.dieRolls.DieRollEntity
+import com.holden.dieRolls.DieRollsTable
 import com.holden.game.GameEntity
 import com.holden.game.GamesTable
 import org.jetbrains.exposed.dao.IntEntity
@@ -21,6 +23,7 @@ class PlayerEntity(id: EntityID<Int>): IntEntity(id) {
     companion object : IntEntityClass<PlayerEntity>(PlayersTable)
     var name by PlayersTable.name
     var game by GameEntity referencedOn PlayersTable.gameCode
+    val dieRolls by DieRollEntity referrersOn DieRollsTable.rolledBy
 }
 
 fun PlayerEntity.toModel() = Player(id.value, name, game.code.value)
