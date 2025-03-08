@@ -19,9 +19,9 @@ fun CreateGame(onCreateGame: (GameForm) -> Unit) {
         Button(onClick = {
             onCreateGame(
                 GameForm(
-                gameTitle,
-                DMForm(userName)
-            )
+                    gameTitle,
+                    DMForm(userName)
+                )
             )
         }) {
             Text("Create")

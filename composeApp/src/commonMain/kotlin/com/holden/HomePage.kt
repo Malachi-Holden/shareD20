@@ -1,6 +1,8 @@
 package com.holden
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,10 +28,10 @@ fun GamePage(
         is AppState.JoinGame -> JoinGame(onJoin = viewModel::onJoin)
         is AppState.CreateGame -> CreateGame(onCreateGame = viewModel::onCreateGame)
         is AppState.PlayingGame -> {
-            PlayingGame(appState.player, appState.game)
+            PlayingGame(appState.player, appState.game, viewModel.currentPlayers)
         }
         is AppState.DMingGame -> {
-            DMingGame(appState.dm, appState.game)
+            DMingGame(appState.dm, appState.game, viewModel.currentPlayers)
         }
         is AppState.ErrorState -> {
             Text("Error: ${appState.error.message}")
@@ -55,21 +57,35 @@ fun Home(
 @Composable
 fun DMingGame(
     dm: DM,
-    game: Game
+    game: Game,
+    allPlayers: List<Player>
 ) {
     Column {
         Text("Welcome ${dm.name}! You are dming game ${game.name}")
         Text("Game code: ${game.code}")
+        Text("All players:")
+        LazyColumn {
+            items(allPlayers) {
+                Text(it.name)
+            }
+        }
     }
 }
 
 @Composable
 fun PlayingGame(
     player: Player,
-    game: Game
+    game: Game,
+    allPlayers: List<Player>
 ) {
     Column {
         Text("Welcome ${player.name}! You are playing game ${game.name}")
         Text("Game code: ${game.code}")
+        Text("All players:")
+        LazyColumn {
+            items(allPlayers) {
+                Text(it.name)
+            }
+        }
     }
 }

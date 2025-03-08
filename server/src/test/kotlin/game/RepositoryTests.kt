@@ -37,8 +37,10 @@ class RepositoryTests: KoinTest {
     fun `create game should create a game with the correct attributes`() = runTransactionTest {
         val form = GameForm("Hello world", DMForm("jack"))
         val game = gamesRepository.create(form)
+        val dmPlayer = PlayerEntity.findById(game.dm.playerId)
         assertEquals(form.name, game.name)
         assertEquals(form.dm.name, game.dm.name)
+        assertEquals(dmPlayer?.name, form.dm.name)
         val gottenGame = GameEntity.findById(game.code)?.toModel()
         assertEquals(game, gottenGame)
     }
@@ -158,6 +160,7 @@ class RepositoryTests: KoinTest {
         val players = gamesRepository.retreivePlayers(newGame.code.value)
 
         assertContentEqualsOrderless(players, listOf(player1, player2, dmPlayer.toModel()))
+        assertContains(players.map { it.name }, "Jack")
     }
 
     @Test

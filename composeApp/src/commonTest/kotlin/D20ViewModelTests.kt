@@ -1,25 +1,22 @@
 import com.holden.*
-import com.holden.game.GameForm
 import com.holden.dm.DMForm
+import com.holden.game.GameForm
 import com.holden.player.PlayerForm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.runTest
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import kotlin.test.*
 import org.koin.test.get
+import util.assertEventually
+import util.toMultiSet
+import kotlin.test.*
 
 class D20ViewModelTests : KoinTest {
     lateinit var repository: D20Repository
     lateinit var viewModel: D20ViewModel
-    val testDispatcher = StandardTestDispatcher()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeTest
     fun setup() {
         val composeTestModule = module {
@@ -31,14 +28,10 @@ class D20ViewModelTests : KoinTest {
         }
         repository = get()
         viewModel = get()
-        Dispatchers.setMain(testDispatcher)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @AfterTest
     fun tearDown() {
-        Dispatchers.resetMain()
-        testDispatcher.cancel()
         stopKoin()
     }
 
@@ -69,23 +62,19 @@ class D20ViewModelTests : KoinTest {
         assertEquals(AppState.DMingGame(game.dm, game), viewModel.getCurrentAppState())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `onCreateGame should add the game eventually`() = runTest {
-        viewModel.onCreateGame(GameForm("test game", DMForm("Test DM")))
-        advanceUntilIdle()
+        viewModel.onCreateGame(GameForm("test game", DMForm("Test DM"))).await()
         assertIs<AppState.DMingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.DMingGame
         val game = repository.gamesRepository.retrieve(state.game.code)
         assertEquals(game, state.game)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `onjoin should create the player and join the game`() = runTest {
         var game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
-        viewModel.onJoin(PlayerForm("john", game.code))
-        advanceUntilIdle()
+        viewModel.onJoin(PlayerForm("john", game.code)).await()
         assertIs<AppState.PlayingGame>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.PlayingGame
         val player = repository.playersRepository.retrieve(state.player.id)
@@ -94,13 +83,24 @@ class D20ViewModelTests : KoinTest {
         assertEquals(game, state.game)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `onjoin should go into error state if game doesn't exist`() = runTest {
-        viewModel.onJoin(PlayerForm("john", "666"))
-        advanceUntilIdle()
+        viewModel.onJoin(PlayerForm("john", "666")).await()
         assertIs<AppState.ErrorState>(viewModel.getCurrentAppState())
         val state = viewModel.getCurrentAppState() as AppState.ErrorState
         assertIs<InvalidGameCode>(state.error)
+    }
+
+    @Test
+    fun `current players should have correct players`() = runTest {
+        val game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
+        val player = repository.playersRepository.create(PlayerForm("James", game.code))
+        val dmplayer = repository.playersRepository.retrieve(game.dm.playerId)
+        assertEquals("Test DM", dmplayer.name)
+        viewModel.goToPlayingGame(player, game)
+        assertEquals(viewModel.getCurrentAppState(), AppState.PlayingGame(player, game))
+        assertEventually(1000) {
+            listOf(player, dmplayer).toMultiSet() == viewModel.getCurrentPlayers().toMultiSet()
+        }
     }
 }

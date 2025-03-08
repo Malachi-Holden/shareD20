@@ -34,7 +34,7 @@ class PlayersPostgresRepository: PlayersRepository {
     }
 
     override suspend fun retreiveDieRolls(playerId: Int): List<DieRoll> = transaction {
-        if (PlayerEntity.findById(playerId) == null) throw InvalidPlayerId(playerId)
-        DieRollEntity.find(DieRollsTable.rolledBy eq playerId).map { it.toModel() }
+        val player = PlayerEntity.findById(playerId) ?: throw InvalidPlayerId(playerId)
+        player.dieRolls.map { it.toModel() }
     }
 }
