@@ -25,4 +25,10 @@ data class DieRoll(
     val value: Int,
     val visibility: DieRollVisibility,
     val fromDM: Boolean
-)
+) {
+    fun normalPlayerCanSee(playerId: Int): Boolean = when(visibility) {
+        DieRollVisibility.All -> true
+        DieRollVisibility.BlindDM -> false
+        DieRollVisibility.PrivateDM -> rolledBy == playerId
+    }
+}

@@ -7,15 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.holden.game.Game
 import com.holden.game.GameForm
 import com.holden.dm.DM
-import com.holden.game.GamesRepository
 import com.holden.game.allPlayersFlow
 import com.holden.player.Player
 import com.holden.player.PlayerForm
-import com.holden.util.flattenConcatEarly
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -28,11 +25,10 @@ class D20ViewModel: ViewModel(), KoinComponent {
         @Composable
         get() = _appState.collectAsState().value
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val _currentPlayers = _appState
-        .map {
-            currentPlayersByAppState(it)
-        }
-        .flattenConcatEarly(viewModelScope, listOf())
+        .flatMapLatest { currentPlayersByAppState(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, listOf())
 
     val currentPlayers: List<Player>
         @Composable

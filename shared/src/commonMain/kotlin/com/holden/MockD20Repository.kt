@@ -1,6 +1,7 @@
 package com.holden
 
 import com.holden.dieRoll.DieRoll
+import com.holden.dieRoll.DieRollVisibility
 import com.holden.dieRoll.MockDieRollsRepository
 import com.holden.dm.DM
 import com.holden.dm.DMForm
@@ -31,7 +32,8 @@ class MockD20Repository(
     override val playersRepository = MockPlayersRepository(
         delayMS = delayMS,
         gameExists = ::gameExists,
-        retrieveDieRollsFromRepo = ::retrieveDieRollsFromRepo
+        retrieveDieRollsFromRepo = ::retrieveDieRollsFromRepo,
+        retrieveVisibleDieRollsForPlayer = ::retrieveVisibleDieRollsForPlayer
     )
 
     override val dmsRepository = MockDMsRepository(
@@ -76,4 +78,15 @@ class MockD20Repository(
     fun retrieveDieRollsFromRepo(id: Int): List<DieRoll> {
         return dieRollsRepository.dieRolls.filterValues { it.rolledBy == id }.values.toList()
     }
+
+    fun retrieveVisibleDieRollsForPlayer(id: Int): List<DieRoll> {
+        val isDM = playerIsDM(id)
+        val gameId = playersRepository.players[id]?.gameCode ?: throw InvalidPlayerId(id)
+        return dieRollsRepository.dieRolls.filterValues {
+            it.gameCode == gameId &&
+            (it.normalPlayerCanSee(id) || isDM)
+        }.values.toList()
+    }
+
+    fun playerIsDM(playerId: Int): Boolean = dmsRepository.dms.any { (_, dm) -> dm.playerId == playerId }
 }

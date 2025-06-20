@@ -137,4 +137,42 @@ class RoutesTests: KoinTest {
         assertEquals(HttpStatusCode.NotFound, response.status)
         assertEquals("InvalidPlayerId", response.bodyAsText())
     }
+
+    @Test
+    fun `get visibleDieRolls should return correct die rolls`() = d20TestApplication(repository) { client ->
+        val testGame = repository.gamesRepository.create(GameForm(name = "hello world", testDM))
+        val player = repository.playersRepository.create(PlayerForm("new player", testGame.code))
+        val otherPlayer = repository.playersRepository.create(PlayerForm("other player", testGame.code))
+        val roll1 = repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            player.id,
+            20,
+            DieRollVisibility.All,
+            false
+        ))
+        val roll2 = repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            player.id,
+            20,
+            DieRollVisibility.PrivateDM,
+            false
+        ))
+        repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            otherPlayer.id,
+            20,
+            DieRollVisibility.PrivateDM,
+            false
+        ))
+        repository.dieRollsRepository.create(DieRollForm(
+            testGame.code,
+            player.id,
+            20,
+            DieRollVisibility.BlindDM,
+            false
+        ))
+        val response = client.get("/players/${player.id}/visibleDieRolls")
+        val rolls: List<DieRoll> = response.body()
+        assertContentEqualsOrderless(listOf(roll1, roll2), rolls)
+    }
 }

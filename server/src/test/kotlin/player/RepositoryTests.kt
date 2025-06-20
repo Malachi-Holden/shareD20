@@ -3,12 +3,10 @@ package player
 import assertContentEqualsOrderless
 import com.holden.InvalidGameCode
 import com.holden.InvalidPlayerId
-import com.holden.dieRoll.DieRoll
 import com.holden.dieRoll.DieRollVisibility
 import com.holden.dieRolls.DieRollEntity
 import com.holden.dieRolls.toModel
 import com.holden.dm.DMEntity
-import com.holden.game.Game
 import com.holden.game.GameEntity
 import com.holden.player.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -44,7 +42,6 @@ class RepositoryTests: KoinTest {
                 game = testGame
             }
         }
-
     }
 
     @AfterTest
@@ -125,14 +122,56 @@ class RepositoryTests: KoinTest {
             visibility = DieRollVisibility.All.ordinal
             fromDM = false
         }.toModel()
-        val rolls = playersRepository.retreiveDieRolls(player.id.value)
+        val rolls = playersRepository.retrieveDieRolls(player.id.value)
         assertContentEqualsOrderless(listOf(roll1, roll2), rolls)
     }
 
     @Test
     fun `retrieve dierolls should fail if player id is bad`() = runTransactionTest {
         assertFailsWith<InvalidPlayerId> {
-            playersRepository.retreiveDieRolls(666)
+            playersRepository.retrieveDieRolls(666)
         }
+    }
+
+    @Test
+    fun `retrieve visible dierolls should return dierolls player should see`() = runTransactionTest {
+        val player = PlayerEntity.new {
+            name = "john"
+            game = testGame
+        }
+        val otherPlayer = PlayerEntity.new {
+            name = "Sue"
+            game = testGame
+        }
+        val roll1 = DieRollEntity.new {
+            game = testGame
+            rolledBy = player
+            value = 20
+            visibility = DieRollVisibility.All.ordinal
+            fromDM = false
+        }.toModel()
+        val roll2 = DieRollEntity.new {
+            game = testGame
+            rolledBy = player
+            value = 20
+            visibility = DieRollVisibility.PrivateDM.ordinal
+            fromDM = false
+        }.toModel()
+        DieRollEntity.new {
+            game = testGame
+            rolledBy = player
+            value = 20
+            visibility = DieRollVisibility.BlindDM.ordinal
+            fromDM = false
+        }.toModel()
+        DieRollEntity.new {
+            game = testGame
+            rolledBy = otherPlayer
+            value = 20
+            visibility = DieRollVisibility.PrivateDM.ordinal
+            fromDM = false
+        }.toModel()
+        val rolls = playersRepository.retrieveVisibleDieRolls(player.id.value)
+        assertContentEqualsOrderless(listOf(roll1, roll2), rolls)
     }
 }
