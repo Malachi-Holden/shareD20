@@ -48,7 +48,7 @@ class ClientRepositoryTests : KoinTest {
         val dieRoll = clientRepository.dieRollsRepository.create(form)
         val dieRollFromServer = serverRepository.dieRollsRepository.retrieve(dieRoll.id)
         assertEquals(dieRollFromServer, dieRoll)
-        assertContains(serverRepository.playersRepository.retreiveDieRolls(player.id), dieRoll)
+        assertContains(serverRepository.playersRepository.retrieveDieRolls(player.id), dieRoll)
     }
 
     @Test

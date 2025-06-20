@@ -4,5 +4,6 @@ import com.holden.CrdRepository
 import com.holden.dieRoll.DieRoll
 
 interface PlayersRepository: CrdRepository<Int, PlayerForm, Player> {
-    suspend fun retreiveDieRolls(playerId: Int): List<DieRoll>
+    suspend fun retrieveDieRolls(playerId: Int): List<DieRoll>
+    suspend fun retrieveVisibleDieRolls(playerId: Int): List<DieRoll>
 }

@@ -42,8 +42,16 @@ class PlayersClientRepository: PlayersRepository, KoinComponent {
         }
     }
 
-    override suspend fun retreiveDieRolls(playerId: Int): List<DieRoll> {
+    override suspend fun retrieveDieRolls(playerId: Int): List<DieRoll> {
         val response = client.get("/players/$playerId/dieRolls")
+        if (!response.status.isSuccess()) {
+            throw getHttpError(response, null, playerId)
+        }
+        return response.body()
+    }
+
+    override suspend fun retrieveVisibleDieRolls(playerId: Int): List<DieRoll> {
+        val response = client.get("/players/$playerId/visibleDieRolls")
         if (!response.status.isSuccess()) {
             throw getHttpError(response, null, playerId)
         }

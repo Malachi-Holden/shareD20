@@ -10,7 +10,8 @@ import kotlinx.coroutines.delay
 class MockPlayersRepository(
     val delayMS: Long = 0,
     val gameExists: (code: String) -> Boolean,
-    val retrieveDieRollsFromRepo: (id: Int) -> List<DieRoll>
+    val retrieveDieRollsFromRepo: (id: Int) -> List<DieRoll>,
+    val retrieveVisibleDieRollsForPlayer: (id: Int) -> List<DieRoll>
 ): PlayersRepository {
     private val generatePlayerIds: Iterator<Int> = generateSequentialIds().iterator()
     val players: MutableMap<Int, Player> = mutableMapOf()
@@ -38,8 +39,13 @@ class MockPlayersRepository(
         players.removeAll { _, player -> player.gameCode == gameCode }
     }
 
-    override suspend fun retreiveDieRolls(playerId: Int): List<DieRoll> {
+    override suspend fun retrieveDieRolls(playerId: Int): List<DieRoll> {
         if (!players.containsKey(playerId)) throw InvalidPlayerId(playerId)
         return retrieveDieRollsFromRepo(playerId)
+    }
+
+    override suspend fun retrieveVisibleDieRolls(playerId: Int): List<DieRoll> {
+        if (!players.containsKey(playerId)) throw InvalidPlayerId(playerId)
+        return retrieveVisibleDieRollsForPlayer(playerId)
     }
 }

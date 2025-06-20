@@ -34,7 +34,16 @@ fun Routing.playersRoutes(repository: PlayersRepository) = route("players") {
     get("/{id}/dieRolls") {
         val id = call.pathParameters["id"]?.toInt() ?: throw InvalidPlayerId(null)
         try {
-            call.respond(repository.retreiveDieRolls(id))
+            call.respond(repository.retrieveDieRolls(id))
+        } catch (e: InvalidPlayerId) {
+            call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
+        }
+    }
+
+    get("/{id}/visibleDieRolls") {
+        val id = call.pathParameters["id"]?.toInt() ?: throw InvalidPlayerId(null)
+        try {
+            call.respond(repository.retrieveVisibleDieRolls(id))
         } catch (e: InvalidPlayerId) {
             call.respond(HttpStatusCode.NotFound, "InvalidPlayerId")
         }
