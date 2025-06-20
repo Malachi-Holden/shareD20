@@ -175,4 +175,11 @@ class RoutesTests: KoinTest {
         val rolls: List<DieRoll> = response.body()
         assertContentEqualsOrderless(listOf(roll1, roll2), rolls)
     }
+
+    @Test
+    fun `get visibledieRolls should fail if player id is bad`() = d20TestApplication(repository) { client ->
+        val response = client.get("/players/666/visibleDieRolls")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+        assertEquals("InvalidPlayerId", response.bodyAsText())
+    }
 }
