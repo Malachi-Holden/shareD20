@@ -1,4 +1,5 @@
 import com.holden.*
+import com.holden.dieRoll.DieRollVisibility
 import com.holden.dm.DMForm
 import com.holden.game.GameForm
 import com.holden.player.PlayerForm
@@ -102,5 +103,18 @@ class D20ViewModelTests : KoinTest {
         assertEventually(1000) {
             listOf(player, dmplayer).toMultiSet() == viewModel.getCurrentPlayers().toMultiSet()
         }
+    }
+
+    @Test
+    fun `rollDie should eventually return a die roll`() = runTest {
+        val game = repository.gamesRepository.create(GameForm("test game", DMForm("Test DM")))
+        val player = repository.playersRepository.create(PlayerForm("James", game.code))
+
+        val roll = viewModel.rollDie(player, game, DieRollVisibility.All).await()
+        assertContains(1..20, roll.value)
+        assertEquals(roll.rolledBy, player.id)
+        assertEquals(roll.visibility,  DieRollVisibility.All)
+        val result = repository.dieRollsRepository.retrieve(0)
+        assertEquals(roll, result)
     }
 }
