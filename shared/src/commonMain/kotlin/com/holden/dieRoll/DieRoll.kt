@@ -2,8 +2,8 @@ package com.holden.dieRoll
 
 import kotlinx.serialization.Serializable
 
-enum class DieRollVisibility{
-    All, BlindDM, PrivateDM
+enum class DieRollVisibility(val title: String) {
+    All("All"), BlindDM("Blind DM"), PrivateDM("Private DM")
 }
 
 @Serializable

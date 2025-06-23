@@ -4,8 +4,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import com.holden.dieRoll.DieRollVisibility
 import com.holden.dm.CreateGame
 import com.holden.game.Game
 import com.holden.player.JoinGame
@@ -28,7 +31,12 @@ fun GamePage(
         is AppState.JoinGame -> JoinGame(onJoin = viewModel::onJoin)
         is AppState.CreateGame -> CreateGame(onCreateGame = viewModel::onCreateGame)
         is AppState.PlayingGame -> {
-            PlayingGame(appState.player, appState.game, viewModel.currentPlayers)
+            PlayingGame(
+                appState.player,
+                appState.game,
+                viewModel.currentPlayers,
+                { viewModel.rollDie(appState.player, appState.game, it) }
+            )
         }
         is AppState.DMingGame -> {
             DMingGame(appState.dm, appState.game, viewModel.currentPlayers)
@@ -76,15 +84,48 @@ fun DMingGame(
 fun PlayingGame(
     player: Player,
     game: Game,
-    allPlayers: List<Player>
+    allPlayers: List<Player>,
+    onRollDie: (DieRollVisibility) -> Unit
 ) {
+    var visibilityType by remember { mutableStateOf(DieRollVisibility.All) }
     Column {
         Text("Welcome ${player.name}! You are playing game ${game.name}")
         Text("Game code: ${game.code}")
+        VisibilityTypeDropdown(visibilityType, onTypeChosen = { visibilityType = it })
+        Button(onClick = { onRollDie(visibilityType) }) {
+            Text("Roll die")
+        }
         Text("All players:")
         LazyColumn {
             items(allPlayers) {
                 Text(it.name)
+            }
+        }
+    }
+}
+
+@Composable
+fun VisibilityTypeDropdown(
+    visibilityType: DieRollVisibility,
+    onTypeChosen: (DieRollVisibility) -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    Column {
+        Button(onClick = {
+            showMenu = !showMenu
+        }) {
+            Text(visibilityType.title)
+        }
+        DropdownMenu(showMenu, onDismissRequest = {
+            showMenu = false
+        }) {
+            for (visibilityType in DieRollVisibility.entries) {
+                DropdownMenuItem(onClick = {
+                    onTypeChosen(visibilityType)
+                    showMenu = false
+                }) {
+                    Text(visibilityType.title)
+                }
             }
         }
     }

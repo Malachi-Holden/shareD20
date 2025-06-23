@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.holden.dieRoll.DieRollForm
+import com.holden.dieRoll.DieRollVisibility
 import com.holden.game.Game
 import com.holden.game.GameForm
 import com.holden.dm.DM
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.io.IOException
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.random.Random
 
 class D20ViewModel: ViewModel(), KoinComponent {
     val repository: D20Repository by inject()
@@ -53,6 +56,19 @@ class D20ViewModel: ViewModel(), KoinComponent {
         val game: Game = repository.gamesRepository.create(form)
         val dm = game.dm
         goToDMingGame(dm, game)
+    }
+
+    fun rollDie(player: Player, game: Game, visibility: DieRollVisibility) = viewModelScope.async {
+        val dieRoll = Random.nextInt(1, 20)
+        repository.dieRollsRepository.create(
+            DieRollForm(
+                game.code,
+                player.id,
+                dieRoll,
+                visibility,
+                player.id == game.dm.playerId
+            )
+        )
     }
 
     fun goToCreateGame() {
